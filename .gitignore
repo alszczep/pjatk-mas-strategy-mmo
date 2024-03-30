@@ -441,3 +441,11 @@ Thumbs.db
 
 .nx/cache
 
+
+# Project
+
+/infrastructure/data
+/infrastructure/secrets
+/infrastructure/log
+/infrastructure/sqlcmd.exe
+/frontend/.nx
