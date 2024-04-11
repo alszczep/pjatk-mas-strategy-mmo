@@ -16,3 +16,16 @@ services:
       - ./data:/var/opt/mssql/data
       - ./log:/var/opt/mssql/log
       - ./secrets:/var/opt/mssql/secrets
+    networks:
+      - local
+  seed-db:
+    build:
+      context: .
+      dockerfile: ./seed-db.dockerfile
+    command: [ "/bin/bash", "-c", "/opt/mssql-tools/bin/sqlcmd -S mssql-db -U sa -P Pass123@ -i ./seed-db.sql" ]
+    networks:
+      - local
+
+networks:
+  local:
+    driver: bridge
