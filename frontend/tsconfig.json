@@ -14,12 +14,13 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {},
-    "jsx": "react-jsx",
-    "allowJs": false,
+    "allowJs": true,
     "esModuleInterop": false,
     "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "types": ["vite/client", "vitest"]
+    "jsx": "preserve",
+    "jsxImportSource": "vue",
+    "resolveJsonModule": true,
+    "verbatimModuleSyntax": true
   },
   "files": [],
   "include": [],

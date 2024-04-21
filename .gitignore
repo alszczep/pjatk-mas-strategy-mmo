@@ -448,4 +448,4 @@ Thumbs.db
 /infrastructure/secrets
 /infrastructure/log
 /frontend/.nx
-/frontend-vue/.nx
+/frontend/.nx
