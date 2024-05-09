@@ -1,10 +1,13 @@
-import './styles.scss';
+import "./styles.scss"
 
-import { createApp } from 'vue';
-import App from './app/App.vue';
-import { vuetifyConfig } from './vuetify.config';
+import { createApp } from "vue"
+import App from "./app/App.vue"
+import { vuetifyConfig } from "./vuetify.config"
+import { router } from "./routes"
 
-const app = createApp(App);
+const app = createApp(App)
 
-app.use(vuetifyConfig);
-app.mount('#root');
+app.use(vuetifyConfig)
+app.use(router)
+
+app.mount("#root")
