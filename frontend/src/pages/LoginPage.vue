@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import WholePageForm from "../components/WholePageForm.vue"
+  import WholePageForm from "../components/common/WholePageForm.vue"
   import { defineModel } from "vue"
   import { logIn } from "../auth/logIn"
   import { routes } from "../routes"

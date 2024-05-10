@@ -1,8 +1,8 @@
 <script setup lang="ts">
-  import WholePageForm from "../components/WholePageForm.vue"
+  import WholePageForm from "../../components/common/WholePageForm.vue"
   import { defineModel } from "vue"
-  import { register } from "../auth/register"
-  import { routes } from "../routes"
+  import { register } from "../../auth/register"
+  import { routes } from "../../routes"
 
   const username = defineModel("username", { type: String })
   const password = defineModel("password", { type: String })

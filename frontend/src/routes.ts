@@ -5,8 +5,8 @@ import {
 } from "vue-router"
 
 import LoginPage from "./pages/LoginPage.vue"
-import RegisterPage from "./pages/RegisterPage.vue"
-import VillagePage from "./pages/VillagePage.vue"
+import RegisterPage from "./pages/register/RegisterPage.vue"
+import VillagePage from "./pages/village/VillagePage.vue"
 import { isLoggedIn } from "./auth/isLoggedIn"
 
 export const routes = {

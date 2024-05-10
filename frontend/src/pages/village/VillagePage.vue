@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { logOut } from "../auth/logOut"
+  import { logOut } from "../../auth/logOut"
 </script>
 
 <template>
