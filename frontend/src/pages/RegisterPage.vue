@@ -1,19 +1,30 @@
 <script setup lang="ts">
   import WholePageForm from "../components/WholePageForm.vue"
   import { defineModel } from "vue"
-  import { logIn } from "../auth/logIn"
+  import { register } from "../auth/register"
   import { routes } from "../routes"
 
   const username = defineModel("username", { type: String })
   const password = defineModel("password", { type: String })
+  const passwordRepeat = defineModel("passwordRepeat", { type: String })
 
   const rules = {
     required: (value?: string) => !!value || "Field is required",
+    matchesPassword: (value?: string) =>
+      value === password.value || "Passwords do not match",
   }
 
-  const onLogin = () => {
-    if (!username.value || !password.value) return
-    logIn(username.value, password.value)
+  const onRegister = () => {
+    if (
+      !username.value ||
+      !password.value ||
+      !passwordRepeat.value ||
+      rules.matchesPassword(passwordRepeat.value) !== true
+    ) {
+      return
+    }
+
+    register(username.value, password.value)
   }
 </script>
 
@@ -32,8 +43,15 @@
       type="password"
       :rules="[rules.required]"
     />
-    <v-btn class="button" @click="onLogin">LOG IN</v-btn>
-    <router-link :to="routes.register">Register</router-link>
+    <v-text-field
+      v-model="passwordRepeat"
+      class="text-field"
+      label="Repeat Password"
+      type="password"
+      :rules="[rules.required, rules.matchesPassword].flat()"
+    />
+    <v-btn class="button" type="submit" @click="onRegister">REGISTER</v-btn>
+    <router-link :to="routes.login">Log in</router-link>
   </WholePageForm>
 </template>
 
