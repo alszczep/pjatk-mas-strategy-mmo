@@ -1,6 +1,9 @@
-import { logIn } from "./logIn"
+import { authTokenKey } from "."
+import { registerEndpoint } from "../api/endpoints"
+import { router, routes } from "../routes"
 
 export const register = async (username: string, password: string) => {
-  // TODO: backend
-  logIn(username, password)
+  const token = await registerEndpoint(username, password)
+  localStorage.setItem(authTokenKey, token.token)
+  router.push(routes.village)
 }
