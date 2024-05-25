@@ -1,10 +1,13 @@
+import { config } from "../config"
+
 export const apiFetch = async (
   endpoint: string,
   method: "GET" | "POST" | "PUT" | "DELETE",
   body?: object,
   options?: RequestInit,
 ) => {
-  const response = await fetch(`http://localhost:5152/api/${endpoint}`, {
+  const url = new URL(endpoint, config.apiBaseUrl)
+  const response = await fetch(url, {
     body: body ? JSON.stringify(body) : undefined,
     method,
     headers: {
