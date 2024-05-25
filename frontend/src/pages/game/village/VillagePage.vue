@@ -1,7 +1,6 @@
 <script setup lang="ts">
   import { ref } from "vue"
-  import { logOut } from "../../auth/logOut"
-  import { ownerVillageEndpoint } from "../../api/endpoints"
+  import { ownerVillageEndpoint } from "../../../api/endpoints"
 
   const villageName = ref<string>()
 
@@ -12,8 +11,8 @@
 </script>
 
 <template>
+  <router-view name="NavBar" />
   <div class="page-wrapper">
-    <v-btn @click="logOut">LOG OUT</v-btn>
     <h1>{{ villageName }}</h1>
   </div>
 </template>

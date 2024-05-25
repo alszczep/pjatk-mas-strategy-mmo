@@ -33,7 +33,7 @@
       :rules="[rules.required]"
     />
     <v-btn class="button" @click="onLogin">LOG IN</v-btn>
-    <router-link :to="routes.register">Register</router-link>
+    <router-link :to="routes.register.index">Register</router-link>
   </WholePageForm>
 </template>
 

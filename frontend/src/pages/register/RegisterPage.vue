@@ -51,7 +51,7 @@
       :rules="[rules.required, rules.matchesPassword].flat()"
     />
     <v-btn class="button" type="submit" @click="onRegister">REGISTER</v-btn>
-    <router-link :to="routes.login">Log in</router-link>
+    <router-link :to="routes.login.index">Log in</router-link>
   </WholePageForm>
 </template>
 
