@@ -1,6 +1,4 @@
 <script setup lang="ts">
-  import { logOut } from "../../auth/logOut"
-
   const { imageUrl, level } = defineProps<{
     imageUrl?: string
     level?: number
@@ -31,7 +29,7 @@
     z-index: 5;
   }
   .background {
-    background-color: #a6edaa;
+    background: #a6edaa;
     width: 100%;
     height: 20px;
 
