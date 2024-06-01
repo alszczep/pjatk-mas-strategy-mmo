@@ -1,7 +1,12 @@
 export const buildingGridHeight = 6
 export const buildingGridWidth = 6
 
-export const buildingPlaceToGridPosition = [
+type GridArea = {
+  gridRow: number
+  gridColumn: number
+}
+
+export const buildingPlaceToGridPosition: GridArea[] & { length: 10 } = [
   {
     gridRow: 5,
     gridColumn: 20,

@@ -3,6 +3,7 @@
   import { ownerVillageEndpoint } from "../../../api/endpoints"
   import type { BuildingSummaryDTO } from "../../../api/dtos"
   import BuildingsGrid from "../../../components/village/BuildingsGrid.vue"
+  import OperationQueue from "../../../components/village/OperationQueue.vue"
 
   const villageName = ref<string>()
 
@@ -68,19 +69,51 @@
       level: 15,
     },
   ]
+
+  // TODO: get from backend
+  const buildingsQueue = [
+    {
+      name: "Koszary",
+      finishTimestamp: 1717258788000,
+      infoColumn: "4",
+    },
+    {
+      name: "Chata drwala",
+      finishTimestamp: 1717264108000,
+      infoColumn: "7",
+    },
+    {
+      name: "Kopalnia",
+      finishTimestamp: 1717343308000,
+      infoColumn: "1",
+    },
+  ]
+
+  // TODO: get from backend
+  const trainingQueue: any[] = []
 </script>
 
 <template>
   <div class="page-wrapper">
-    <BuildingsGrid :buildings="buildings" />
-
     <!-- <h1>{{ villageName }}</h1> -->
+    <BuildingsGrid :buildings="buildings" />
+    <OperationQueue
+      title="Buildings queue"
+      info-column-title="Upgrade to level"
+      :items="buildingsQueue"
+    />
+    <OperationQueue
+      title="Troops training queue"
+      info-column-title="Number of troops"
+      :items="trainingQueue"
+    />
   </div>
 </template>
 
 <style scoped>
   .page-wrapper {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
   }
 </style>

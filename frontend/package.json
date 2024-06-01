@@ -10,9 +10,10 @@
   },
   "private": true,
   "dependencies": {
+    "@vueuse/core": "10.10.0",
     "vue": "3.4.27",
     "vue-router": "4.3.2",
-    "vuetify": "3.6.4"
+    "vuetify": "3.6.8"
   },
   "devDependencies": {
     "@nx/eslint": "18.2.4",

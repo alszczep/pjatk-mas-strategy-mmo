@@ -47,9 +47,9 @@
 <style scoped>
   .buildings-grid {
     display: grid;
-    grid-template: repeat(50, 1fr) / repeat(50, 1fr);
+    grid-template: repeat(45, 1fr) / repeat(50, 1fr);
 
     width: 800px;
-    height: 600px;
+    height: 550px;
   }
 </style>
