@@ -7,8 +7,9 @@
     buildingPlaceToGridPosition,
   } from "./buildingsGridConfig"
 
-  const { buildings } = defineProps<{
+  const { buildings, villageId } = defineProps<{
     buildings: BuildingSummaryDTO[]
+    villageId: string
   }>()
 
   const appendSizeToGridPosition = (position: {
@@ -39,7 +40,12 @@
       class="building-wrapper"
       :style="{ gridRow: building.gridRow, gridColumn: building.gridColumn }"
     >
-      <Building :image-url="building.imageUrl" :level="building.level" />
+      <Building
+        :image-url="building.imageUrl"
+        :level="building.level"
+        :place-in-village="building.place"
+        :village-id="villageId"
+      />
     </div>
   </div>
 </template>

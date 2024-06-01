@@ -1,16 +1,23 @@
 <script setup lang="ts">
-  const { imageUrl, level } = defineProps<{
+  import { routes } from "../../routes"
+
+  const { imageUrl, level, villageId, placeInVillage } = defineProps<{
     imageUrl?: string
     level?: number
+    villageId: string
+    placeInVillage: number
   }>()
 </script>
 
 <template>
-  <div class="wrapper">
+  <router-link
+    :to="routes.game.village.building.withParam(villageId, placeInVillage)"
+    class="wrapper"
+  >
     <img :src="imageUrl" class="image" />
     <div v-if="level" class="level">{{ level }}</div>
     <div class="background" />
-  </div>
+  </router-link>
 </template>
 
 <style scoped>

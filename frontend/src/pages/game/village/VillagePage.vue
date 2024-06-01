@@ -12,23 +12,21 @@
   import { routes } from "../../../routes"
 
   const route = useRoute()
-  const villageId = ref<string>(
-    route.params[routes.game.village.param] as string,
-  )
+  const villageId = route.params[routes.game.village.param] as string
 
   const villageName = ref<string>()
 
   async function fetchOwnersVillage() {
-    if (villageId.value === undefined) {
+    if (villageId === undefined) {
       return
     }
 
-    if (villageId.value === routes.game.village.paramDefault) {
+    if (villageId === routes.game.village.paramDefault) {
       villageName.value = (await ownerVillageEndpoint()).name
       return
     }
 
-    villageName.value = (await villageByIdEndpoint(villageId.value)).name
+    villageName.value = (await villageByIdEndpoint(villageId)).name
   }
   fetchOwnersVillage()
 
@@ -116,7 +114,7 @@
 <template>
   <div class="page-wrapper">
     <!-- <h1>{{ villageName }}</h1> -->
-    <BuildingsGrid :buildings="buildings" />
+    <BuildingsGrid :buildings="buildings" :village-id="villageId" />
     <OperationQueue
       title="Buildings queue"
       info-column-title="Upgrade to level"
