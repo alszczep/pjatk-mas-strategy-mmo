@@ -1,14 +1,34 @@
 <script setup lang="ts">
   import { ref } from "vue"
-  import { ownerVillageEndpoint } from "../../../api/endpoints"
+  import {
+    ownerVillageEndpoint,
+    villageByIdEndpoint,
+  } from "../../../api/endpoints"
   import type { BuildingSummaryDTO } from "../../../api/dtos"
   import BuildingsGrid from "../../../components/village/BuildingsGrid.vue"
   import OperationQueue from "../../../components/village/OperationQueue.vue"
 
+  import { useRoute } from "vue-router"
+  import { routes } from "../../../routes"
+
+  const route = useRoute()
+  const villageId = ref<string>(
+    route.params[routes.game.village.param] as string,
+  )
+
   const villageName = ref<string>()
 
   async function fetchOwnersVillage() {
-    villageName.value = (await ownerVillageEndpoint()).name
+    if (villageId.value === undefined) {
+      return
+    }
+
+    if (villageId.value === routes.game.village.paramDefault) {
+      villageName.value = (await ownerVillageEndpoint()).name
+      return
+    }
+
+    villageName.value = (await villageByIdEndpoint(villageId.value)).name
   }
   fetchOwnersVillage()
 

@@ -20,12 +20,21 @@ export const routes = {
   },
   game: {
     index: "/game",
-    village: "/game/village",
+    village: {
+      index: "/game/village",
+      param: "villageId",
+      withParam: (villageId: string) => `/game/village/${villageId}`,
+      paramDefault: "owner",
+    },
   },
 } as const
 
-export const getLastRoutePart = (route: `${string}/${string}`) =>
+const getLastRoutePart = (route: `${string}/${string}`) =>
   route.split("/").at(-1) ?? ""
+const getLastRoutePartWithParam = (route: {
+  index: `${string}/${string}`
+  param: string
+}) => `${getLastRoutePart(route.index)}/:${route.param}`
 
 const routesComponents = [
   { path: routes.login.index, component: LoginPage },
@@ -38,7 +47,7 @@ const routesComponents = [
     component: GamePage,
     children: [
       {
-        path: getLastRoutePart(routes.game.village),
+        path: getLastRoutePartWithParam(routes.game.village),
         components: {
           default: VillagePage,
           NavBar,
@@ -60,7 +69,7 @@ router.beforeEach((to) => {
 
   if (isPathWithoutAuth(to)) {
     if (isLoggedIn()) {
-      return routes.game.village
+      return routes.game.village.withParam(routes.game.village.paramDefault)
     }
   } else {
     if (!isLoggedIn()) {
