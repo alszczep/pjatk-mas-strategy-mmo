@@ -6,7 +6,7 @@
   <v-app-bar :elevation="2">
     <div class="content">
       <div />
-      <v-btn @click="logOut">LOGOUT</v-btn>
+      <v-btn @click="logOut">LOG OUT</v-btn>
     </div>
   </v-app-bar>
 </template>

@@ -1,3 +1,4 @@
+import { authTokenKey } from "../auth"
 import { config } from "../config"
 
 export const apiFetch = async (
@@ -12,7 +13,7 @@ export const apiFetch = async (
     method,
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+      Authorization: `Bearer ${localStorage.getItem(authTokenKey)}`,
       credentials: "include",
       ...options?.headers,
     },

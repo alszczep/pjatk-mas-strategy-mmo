@@ -1,12 +1,5 @@
 import { apiFetch } from "./apiFetch"
-
-type VillageDTO = {
-  name: string
-}
-
-type TokenDTO = {
-  token: string
-}
+import type { TokenDTO, VillageDTO } from "./dtos"
 
 export const loginEndpoint = (
   username: string,
