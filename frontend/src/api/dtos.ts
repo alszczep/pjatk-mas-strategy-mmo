@@ -8,6 +8,6 @@ export type TokenDTO = {
 
 export type BuildingSummaryDTO = {
   place: number
-  level: number
-  imageUrl: string
+  level?: number
+  imageUrl?: string
 }

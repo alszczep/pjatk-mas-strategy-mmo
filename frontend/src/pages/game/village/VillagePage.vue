@@ -21,9 +21,6 @@
     },
     {
       place: 1,
-      imageUrl:
-        "https://opengameart.org/sites/default/files/styles/medium/public/blacksmith.svg_.png",
-      level: 1,
     },
     {
       place: 2,
@@ -33,9 +30,6 @@
     },
     {
       place: 3,
-      imageUrl:
-        "https://opengameart.org/sites/default/files/styles/medium/public/blacksmith.svg_.png",
-      level: 1,
     },
     {
       place: 4,
@@ -65,13 +59,13 @@
       place: 8,
       imageUrl:
         "https://opengameart.org/sites/default/files/styles/medium/public/blacksmith.svg_.png",
-      level: 1,
+      level: 20,
     },
     {
       place: 9,
       imageUrl:
         "https://opengameart.org/sites/default/files/styles/medium/public/blacksmith.svg_.png",
-      level: 1,
+      level: 15,
     },
   ]
 </script>
