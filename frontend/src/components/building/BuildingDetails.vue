@@ -19,7 +19,7 @@
 <template>
   <v-card class="wrapper">
     <v-card-title
-      >{{ building.name }} - {{ building.level }} level</v-card-title
+      >{{ building.name }} - level {{ building.level }}</v-card-title
     >
     <v-card-text class="text">
       <div class="top">

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import { useToast } from "vue-toast-notification"
   import type { BuildableBuildingDTO, BuildingDetailsDTO } from "../../api/dtos"
   import ResourcesRow from "../common/ResourcesRow.vue"
 
@@ -7,8 +8,10 @@
     villageId: string
   }>()
 
+  const $toast = useToast()
+
   const build = () => {
-    alert("TODO")
+    $toast.error("TODO")
   }
 </script>
 
