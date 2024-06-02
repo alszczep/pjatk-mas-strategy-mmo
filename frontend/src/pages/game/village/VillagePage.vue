@@ -10,6 +10,7 @@
 
   import { useRoute } from "vue-router"
   import { routes } from "../../../routes"
+  import ResourcesRow from "../../../components/common/ResourcesRow.vue"
 
   const route = useRoute()
   const villageId = route.params[routes.game.village.param] as string
@@ -113,7 +114,10 @@
 
 <template>
   <div class="page-wrapper">
-    <!-- <h1>{{ villageName }}</h1> -->
+    <!-- TODO: get from backend -->
+    <div class="resources">
+      <ResourcesRow :values="{ wood: 100, iron: 200, wheat: 300, gold: 400 }" />
+    </div>
     <BuildingsGrid :buildings="buildings" :village-id="villageId" />
     <OperationQueue
       title="Buildings queue"
@@ -133,5 +137,10 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+  }
+
+  .resources {
+    width: 100%;
+    padding: 4px 8px 16px;
   }
 </style>
