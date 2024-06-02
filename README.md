@@ -1,3 +1,7 @@
 # pjatk-mas
 
-https://github.com/microsoft/go-sqlcmd/releases/tag/v1.6.0
+
+### Assets
+
+https://opengameart.org/content/magic-and-mechanic-in-game-interface-icons
+
