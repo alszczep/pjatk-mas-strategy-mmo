@@ -129,13 +129,17 @@
 <template>
   <div class="page-wrapper">
     <!-- TODO: get from backend -->
-    <div class="resources">
-      <ResourcesRow :values="{ wood: 100, iron: 200, wheat: 300, gold: 400 }" />
-    </div>
+    <ResourcesRow
+      :values="{ wood: 100, iron: 200, wheat: 300, gold: 400 }"
+      class="resources"
+    />
     <div class="buildings-and-troops">
-      <div class="buildings">
-        <BuildingsGrid :buildings="buildings" :village-id="villageId" />
-      </div>
+      <BuildingsGrid
+        :buildings="buildings"
+        :village-id="villageId"
+        class="buildings"
+      />
+
       <TroopsList :troops="troops" />
     </div>
     <OperationQueue
@@ -160,8 +164,7 @@
   }
 
   .resources {
-    width: 100%;
-    padding-bottom: 8px;
+    margin-bottom: 8px;
   }
 
   .buildings-and-troops {
@@ -171,8 +174,7 @@
   }
 
   .buildings {
-    display: flex;
-    justify-content: center;
+    margin: 0 auto;
   }
 
   .troops-training-queue {

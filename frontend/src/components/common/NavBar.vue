@@ -9,10 +9,10 @@
       <div>
         <router-link
           :to="routes.game.village.withParam(routes.game.village.paramDefault)"
-          ><v-btn to="/">YOUR VILLAGE</v-btn></router-link
+          ><v-btn variant="tonal" to="/">YOUR VILLAGE</v-btn></router-link
         >
       </div>
-      <v-btn @click="logOut">LOG OUT</v-btn>
+      <v-btn variant="tonal" @click="logOut">LOG OUT</v-btn>
     </div>
   </v-app-bar>
 </template>

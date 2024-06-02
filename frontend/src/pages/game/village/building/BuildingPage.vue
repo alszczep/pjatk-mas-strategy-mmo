@@ -5,8 +5,11 @@
     BuildableBuildingDTO,
     BuildingDetailsDTO,
   } from "../../../../api/dtos"
+  import ResourcesRow from "../../../../components/common/ResourcesRow.vue"
+  import BuildableBuildingsList from "../../../../components/building/BuildableBuildingsList.vue"
 
   const route = useRoute()
+  const villageId = route.params[routes.game.village.param] as string
   const placeInVillage = route.params[
     routes.game.village.building.param
   ] as string
@@ -61,7 +64,7 @@
   //     }
   //   ],
   // }
-  const buildableBuilding: BuildableBuildingDTO[] = [
+  const buildableBuildings: BuildableBuildingDTO[] = [
     {
       id: "1",
       name: "Mine",
@@ -90,7 +93,16 @@
 </script>
 
 <template>
-  <div class="page-wrapper">building page</div>
+  <div class="page-wrapper">
+    <ResourcesRow
+      :values="{ wood: 100, iron: 200, wheat: 300, gold: 400 }"
+      class="resources"
+    />
+    <BuildableBuildingsList
+      :buildings="buildableBuildings"
+      :village-id="villageId"
+    />
+  </div>
 </template>
 
 <style scoped>
@@ -98,5 +110,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+  }
+
+  .resources {
+    margin-bottom: 8px;
   }
 </style>
