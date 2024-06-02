@@ -49,8 +49,8 @@
   }
 
   .image {
-    width: 92px;
-    height: 92px;
+    width: 96px;
+    height: 96px;
   }
 
   .info {
@@ -65,5 +65,6 @@
 
   .button {
     margin-left: auto;
+    margin-top: 16px;
   }
 </style>
