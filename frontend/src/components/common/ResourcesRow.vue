@@ -7,7 +7,7 @@
 </script>
 
 <template>
-  <div class="wrapper">
+  <v-card class="wrapper">
     <div>
       <img src="../../assets/wood.bmp" />
       <div>{{ values.wood }}</div>
@@ -24,7 +24,7 @@
       <img src="../../assets/gold.bmp" />
       <div>{{ values.gold }}</div>
     </div>
-  </div>
+  </v-card>
 </template>
 
 <style scoped>
@@ -32,6 +32,7 @@
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     width: 100%;
+    padding: 4px 16px;
   }
 
   .wrapper > div {

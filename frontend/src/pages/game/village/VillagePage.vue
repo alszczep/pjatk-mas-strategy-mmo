@@ -7,10 +7,10 @@
   import type { BuildingSummaryDTO } from "../../../api/dtos"
   import BuildingsGrid from "../../../components/village/BuildingsGrid.vue"
   import OperationQueue from "../../../components/village/OperationQueue.vue"
-
   import { useRoute } from "vue-router"
   import { routes } from "../../../routes"
   import ResourcesRow from "../../../components/common/ResourcesRow.vue"
+  import TroopsList from "../../../components/village/TroopsList.vue"
 
   const route = useRoute()
   const villageId = route.params[routes.game.village.param] as string
@@ -110,6 +110,20 @@
 
   // TODO: get from backend
   const trainingQueue: any[] = []
+
+  // TODO: get from backend
+  const troops = [
+    {
+      name: "Swordsman",
+      imageUrl: "http://localhost:4200/armored_swordman.bmp",
+      count: 10,
+    },
+    {
+      name: "Archer",
+      imageUrl: "http://localhost:4200/archer.bmp",
+      count: 45,
+    },
+  ]
 </script>
 
 <template>
@@ -118,7 +132,12 @@
     <div class="resources">
       <ResourcesRow :values="{ wood: 100, iron: 200, wheat: 300, gold: 400 }" />
     </div>
-    <BuildingsGrid :buildings="buildings" :village-id="villageId" />
+    <div class="buildings-and-troops">
+      <div class="buildings">
+        <BuildingsGrid :buildings="buildings" :village-id="villageId" />
+      </div>
+      <TroopsList :troops="troops" />
+    </div>
     <OperationQueue
       title="Buildings queue"
       info-column-title="Upgrade to level"
@@ -128,6 +147,7 @@
       title="Troops training queue"
       info-column-title="Number of troops"
       :items="trainingQueue"
+      class="troops-training-queue"
     />
   </div>
 </template>
@@ -141,6 +161,21 @@
 
   .resources {
     width: 100%;
-    padding: 4px 8px 16px;
+    padding-bottom: 8px;
+  }
+
+  .buildings-and-troops {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 400px;
+  }
+
+  .buildings {
+    display: flex;
+    justify-content: center;
+  }
+
+  .troops-training-queue {
+    margin-top: 16px;
   }
 </style>
