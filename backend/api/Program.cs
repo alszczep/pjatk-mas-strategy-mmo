@@ -1,5 +1,7 @@
 using System.Text;
 using api.DataAccess;
+using api.Repositories;
+using api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -42,6 +44,12 @@ builder.Services.AddAuthentication(options =>
     options.MapInboundClaims = false;
 });
 builder.Services.AddAuthorization();
+
+builder.Services.AddScoped<IUsersRepository, UsersRepository>();
+builder.Services.AddScoped<IUsersService, UsersService>();
+builder.Services.AddScoped<IVillagesRepository, VillagesRepository>();
+builder.Services.AddScoped<IVillagesService, VillagesService>();
+builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
 
 
 WebApplication app = builder.Build();

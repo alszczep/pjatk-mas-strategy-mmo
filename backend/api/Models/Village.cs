@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations.Schema;
-
 namespace api.Models;
 
 public class Village
@@ -9,8 +7,8 @@ public class Village
     public string? CrestImageUrl { get; private set; }
     public DateTime CreationDateTime { get; init; }
 
-    [NotMapped] public Guid OwnerId { get; init; }
-    [NotMapped] public User Owner { get; init; } = null!;
+    public Guid OwnerId { get; init; }
+    public User Owner { get; init; } = null!;
     public List<User> Assistants { get; private set; } = [];
 
     public static Village CreateVillage(string name, User owner)

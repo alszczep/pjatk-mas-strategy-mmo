@@ -1,14 +1,9 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using api.Controllers.DTOs;
-using api.DataAccess;
 using api.Models;
+using api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Primitives;
-using Microsoft.IdentityModel.Tokens;
+using IAuthorizationService = api.Services.IAuthorizationService;
 
 namespace api.Controllers;
 
@@ -17,55 +12,43 @@ namespace api.Controllers;
 [ApiController]
 public class VillageController : ControllerBase
 {
-    private readonly IConfiguration configuration;
-    private readonly CoreDbContext coreDbContext;
+    private readonly IVillagesService villagesService;
+    private readonly IAuthorizationService authorizationService;
 
-    public VillageController(IConfiguration configuration, CoreDbContext coreDbContext)
+    public VillageController(IVillagesService villagesService, IAuthorizationService authorizationService)
     {
-        this.configuration = configuration;
-        this.coreDbContext = coreDbContext;
+        this.villagesService = villagesService;
+        this.authorizationService = authorizationService;
     }
 
     [HttpGet("byVillageId/{id}")]
-    public async Task<ActionResult<VillageDTO?>> GetVillageByVillageId(CancellationToken cancellationToken)
+    public async Task<ActionResult<VillageDTO?>> GetVillageByVillageId([FromQuery] Guid villageId,
+        CancellationToken cancellationToken)
     {
-        return await this.coreDbContext.Villages
-            .Select(v => new VillageDTO
-            {
-                Name = v.Name
-            })
-            .FirstOrDefaultAsync(cancellationToken);
+        Village? village = await this.villagesService.GetVillageById(villageId, cancellationToken);
+
+        if (village == null) return this.NotFound();
+
+        return new VillageDTO
+        {
+            Name = village.Name
+        };
     }
 
     [HttpGet("byOwner")]
     public async Task<ActionResult<VillageDTO>> GetVillageByOwner(CancellationToken cancellationToken)
     {
-        this.Request.Headers.TryGetValue("Authorization", out StringValues token);
-        string tokenString = token.ToString().Replace("Bearer ", string.Empty);
+        var userId = this.authorizationService.ExtractUserId(this.Request);
 
-        JwtSecurityTokenHandler tokenHandler = new();
-        TokenValidationParameters validations = new()
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.configuration["Auth:JwtSecret"]!)),
-            ValidateIssuer = false,
-            ValidateAudience = false,
-            ValidateLifetime = true
-        };
-        ClaimsPrincipal? claims = tokenHandler.ValidateToken(tokenString, validations, out _);
-        string? claimValue = claims.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!userId.HasValue) return this.Unauthorized();
 
-        if (claimValue == null) return this.Unauthorized();
+        Village? village = await this.villagesService.GetVillageByUserId(userId.Value, cancellationToken);
 
-        User? user = await this.coreDbContext.Users
-            .Include(u => u.OwnedVillage)
-            .FirstOrDefaultAsync(u => u.Id == Guid.Parse(claimValue), cancellationToken);
-
-        if (user == null) return this.Unauthorized();
+        if (village == null) return this.Unauthorized();
 
         return new VillageDTO
         {
-            Name = user.OwnedVillage.Name
+            Name = village.Name
         };
     }
 }

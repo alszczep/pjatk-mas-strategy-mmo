@@ -1,8 +1,7 @@
 using api.Controllers.DTOs;
-using api.DataAccess;
 using api.Models;
+using api.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace api.Controllers;
 
@@ -11,19 +10,21 @@ namespace api.Controllers;
 public class UserController : ControllerBase
 {
     private readonly IConfiguration configuration;
-    private readonly CoreDbContext coreDbContext;
+    private readonly IUsersService usersService;
+    private readonly IVillagesService villagesService;
 
-    public UserController(IConfiguration configuration, CoreDbContext coreDbContext)
+    public UserController(IConfiguration configuration, IUsersService usersService,
+        IVillagesService villagesService)
     {
         this.configuration = configuration;
-        this.coreDbContext = coreDbContext;
+        this.usersService = usersService;
+        this.villagesService = villagesService;
     }
 
     [HttpPost("login")]
     public async Task<ActionResult<TokenDTO>> Login([FromBody] UserAuthDTO dto, CancellationToken cancellationToken)
     {
-        User? user =
-            await this.coreDbContext.Users.FirstOrDefaultAsync(u => u.Username == dto.Username, cancellationToken);
+        User? user = await this.usersService.GetUserByUsername(dto.Username, cancellationToken);
 
         if (user == null) return this.Unauthorized();
 
@@ -33,7 +34,7 @@ public class UserController : ControllerBase
 
         if (user.JwtToken == null) return this.StatusCode(500);
 
-        await this.coreDbContext.SaveChangesAsync(cancellationToken);
+        await this.usersService.SaveChangesAsync(cancellationToken);
 
         return new TokenDTO()
         {
@@ -45,25 +46,21 @@ public class UserController : ControllerBase
     [HttpPost("register")]
     public async Task<ActionResult<TokenDTO>> Register([FromBody] UserAuthDTO dto, CancellationToken cancellationToken)
     {
-        if (dto.Username.Length > 120)
+        if (this.usersService.IsUsernameValid(dto.Username))
             return this.BadRequest(
                 "Username must but 120 characters or shorter");
-        if (dto.Password.Length > 120)
+        if (this.usersService.IsPasswordValid(dto.Password))
             return this.BadRequest(
                 "Password must but 120 characters or shorter");
 
-
-        User user = api.Models.User.CreateUser(dto.Username, dto.Password, this.configuration["Auth:PasswordSalt"]!);
-        this.coreDbContext.Users.Add(user);
-
-        Village village = Village.CreateVillage("New village", user);
-        this.coreDbContext.Villages.Add(village);
+        User user = this.usersService.CreateUser(dto.Username, dto.Password);
+        this.villagesService.CreateVillage("New village", user);
 
         user.GenerateJwtToken(this.configuration["Auth:JwtSecret"]!);
 
         if (user.JwtToken == null) return this.StatusCode(500);
 
-        await this.coreDbContext.SaveChangesAsync(cancellationToken);
+        await this.usersService.SaveChangesAsync(cancellationToken);
 
         return new TokenDTO()
         {
