@@ -8,4 +8,5 @@ public class BuildingInVillage
 
     public Village Village { get; init; } = null!;
     public Building Building { get; init; } = null!;
+    public ICollection<BuildingsQueue> BuildingQueue { get; set; } = new List<BuildingsQueue>();
 }

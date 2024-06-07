@@ -11,6 +11,9 @@ public class Village
     public User Owner { get; init; } = null!;
     public ICollection<User> Assistants { get; private set; } = [];
     public ICollection<BuildingInVillage> Buildings { get; private set; } = new List<BuildingInVillage>();
+    public ICollection<MilitaryUnitsInVillage> MilitaryUnits { get; private set; } = new List<MilitaryUnitsInVillage>();
+    public ICollection<MilitaryUnitsQueue> MilitaryUnitsQueue { get; private set; } = new List<MilitaryUnitsQueue>();
+    public Resources AvailableResources { get; private set; } = null!;
 
     public static Village CreateVillage(string name, User owner)
     {

@@ -27,6 +27,9 @@ public class CoreDbContext : DbContext
     public DbSet<MilitaryUnit> MilitaryUnits { get; set; } = null!;
     public DbSet<BuildingLevel> BuildingLevels { get; set; } = null!;
     public DbSet<Resources> Resources { get; set; } = null!;
+    public DbSet<BuildingsQueue> BuildingsQueue { get; set; } = null!;
+    public DbSet<MilitaryUnitsQueue> MilitaryUnitsQueue { get; set; } = null!;
+    public DbSet<MilitaryUnitsInVillage> MilitaryUnitsInVillage { get; set; } = null!;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -67,6 +70,8 @@ public class CoreDbContext : DbContext
             entity.Property(e => e.Name).HasMaxLength(120).IsRequired();
             entity.Property(e => e.CrestImageUrl);
             entity.Property(e => e.CreationDateTime).IsRequired();
+
+            entity.HasOne(e => e.AvailableResources).WithOne().HasForeignKey<Resources>(e => e.Id).IsRequired();
         });
 
         modelBuilder.Entity<Building>(entity =>
@@ -123,8 +128,6 @@ public class CoreDbContext : DbContext
             entity.Property(e => e.Level).IsRequired();
             entity.Property(e => e.BuildingTimeInSeconds).IsRequired();
             entity.Property(e => e.TrainingTimeShortenedInSeconds);
-            // entity.Property(e => e.ResourcesCost).IsRequired();
-            // entity.Property(e => e.ResourcesProductionPerMinute);
 
             entity.HasOne(e => e.ResourcesCost).WithMany().IsRequired();
             entity.HasOne(e => e.ResourcesProductionPerMinute).WithMany();
@@ -140,6 +143,45 @@ public class CoreDbContext : DbContext
             entity.Property(e => e.Iron).IsRequired();
             entity.Property(e => e.Wheat).IsRequired();
             entity.Property(e => e.Gold).IsRequired();
+        });
+
+        modelBuilder.Entity<BuildingsQueue>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.ToTable("BuildingsQueue");
+
+            entity.Property(e => e.StartTime).IsRequired();
+            entity.Property(e => e.EndTime).IsRequired();
+            entity.Property(e => e.LevelAfterUpgrade).IsRequired();
+
+            entity.HasOne(e => e.BuildingInVillage).WithMany().IsRequired();
+        });
+
+        modelBuilder.Entity<MilitaryUnitsQueue>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.ToTable("MilitaryUnitsQueue");
+
+            entity.Property(e => e.StartTime).IsRequired();
+            entity.Property(e => e.EndTime).IsRequired();
+            entity.Property(e => e.Amount).IsRequired();
+
+            entity.HasOne(e => e.MilitaryUnit).WithMany().IsRequired();
+            entity.HasOne(e => e.Village).WithMany().IsRequired();
+        });
+
+        modelBuilder.Entity<MilitaryUnitsInVillage>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.ToTable("MilitaryUnitsInVillage");
+
+            entity.Property(e => e.Amount).IsRequired();
+
+            entity.HasOne(e => e.MilitaryUnit).WithMany().IsRequired();
+            entity.HasOne(e => e.Village).WithMany().IsRequired();
         });
     }
 }
