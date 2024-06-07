@@ -20,6 +20,13 @@ public class CoreDbContext : DbContext
 
     public DbSet<User> Users { get; set; } = null!;
     public DbSet<Village> Villages { get; set; } = null!;
+    public DbSet<Building> Buildings { get; set; } = null!;
+    public DbSet<BuildingBarracks> BuildingsBarracks { get; set; } = null!;
+    public DbSet<BuildingResources> BuildingsResources { get; set; } = null!;
+    public DbSet<BuildingInVillage> BuildingsInVillage { get; set; } = null!;
+    public DbSet<MilitaryUnit> MilitaryUnits { get; set; } = null!;
+    public DbSet<BuildingLevel> BuildingLevels { get; set; } = null!;
+    public DbSet<Resources> Resources { get; set; } = null!;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -62,14 +69,77 @@ public class CoreDbContext : DbContext
             entity.Property(e => e.CreationDateTime).IsRequired();
         });
 
-        // modelBuilder.Entity<Assistant>(entity =>
-        // {
-        //     entity.HasKey(e => e.Id);
-        //
-        //     entity.ToTable("Assistant");
-        //
-        //     entity.HasOne(e => e.User).WithMany(e => e.AssistedVillages).HasForeignKey(e => e.UserId).IsRequired();
-        //     entity.HasOne(e => e.Village).WithMany(e => e.Assistants).HasForeignKey(e => e.VillageId).IsRequired();
-        // });
+        modelBuilder.Entity<Building>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.ToTable("Building");
+
+            entity.Property(e => e.Name).HasMaxLength(120).IsRequired();
+            entity.Property(e => e.MaxInVillage).IsRequired();
+            entity.Property(e => e.ImageUrl).IsRequired();
+
+            entity.HasDiscriminator(e => e.Type)
+                .HasValue<BuildingBarracks>(BuildingType.Barracks)
+                .HasValue<BuildingResources>(BuildingType.Resources);
+        });
+
+        modelBuilder.Entity<BuildingBarracks>(entity =>
+        {
+            entity.HasMany(e => e.TrainableUnits).WithMany(e => e.TrainableInBarracks);
+        });
+
+        modelBuilder.Entity<BuildingResources>(entity => { });
+
+        modelBuilder.Entity<BuildingInVillage>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.ToTable("BuildingInVillage");
+
+            entity.HasOne(e => e.Building).WithMany(e => e.InVillages).IsRequired();
+            entity.HasOne(e => e.Village).WithMany(e => e.Buildings).IsRequired();
+        });
+
+        modelBuilder.Entity<MilitaryUnit>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.ToTable("MilitaryUnit");
+
+            entity.Property(e => e.Name).HasMaxLength(120).IsRequired();
+            entity.Property(e => e.Attack).IsRequired();
+            entity.Property(e => e.Defense).IsRequired();
+            entity.Property(e => e.IconUrl);
+            entity.Property(e => e.MinBarracksLevel).IsRequired();
+        });
+
+        modelBuilder.Entity<BuildingLevel>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.ToTable("BuildingLevel");
+
+            entity.Property(e => e.Level).IsRequired();
+            entity.Property(e => e.BuildingTimeInSeconds).IsRequired();
+            entity.Property(e => e.TrainingTimeShortenedInSeconds);
+            // entity.Property(e => e.ResourcesCost).IsRequired();
+            // entity.Property(e => e.ResourcesProductionPerMinute);
+
+            entity.HasOne(e => e.ResourcesCost).WithMany().IsRequired();
+            entity.HasOne(e => e.ResourcesProductionPerMinute).WithMany();
+        });
+
+        modelBuilder.Entity<Resources>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.ToTable("Resources");
+
+            entity.Property(e => e.Wood).IsRequired();
+            entity.Property(e => e.Iron).IsRequired();
+            entity.Property(e => e.Wheat).IsRequired();
+            entity.Property(e => e.Gold).IsRequired();
+        });
     }
 }

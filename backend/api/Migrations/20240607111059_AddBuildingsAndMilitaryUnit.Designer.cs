@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using api.DataAccess;
 
@@ -11,9 +12,11 @@ using api.DataAccess;
 namespace api.Migrations
 {
     [DbContext(typeof(CoreDbContext))]
-    partial class CoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240607111059_AddBuildingsAndMilitaryUnit")]
+    partial class AddBuildingsAndMilitaryUnit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -54,6 +57,11 @@ namespace api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("BuildingType")
+                        .IsRequired()
+                        .HasMaxLength(13)
+                        .HasColumnType("nvarchar(13)");
+
                     b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -66,14 +74,11 @@ namespace api.Migrations
                         .HasMaxLength(120)
                         .HasColumnType("nvarchar(120)");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.ToTable("Building", "mas");
 
-                    b.HasDiscriminator<int>("Type");
+                    b.HasDiscriminator<string>("BuildingType").HasValue("Building");
 
                     b.UseTphMappingStrategy();
                 });
@@ -105,41 +110,6 @@ namespace api.Migrations
                     b.ToTable("BuildingInVillage", "mas");
                 });
 
-            modelBuilder.Entity("api.Models.BuildingLevel", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("BuildingId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("BuildingTimeInSeconds")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Level")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("ResourcesCostId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("ResourcesProductionPerMinuteId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int?>("TrainingTimeShortenedInSeconds")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BuildingId");
-
-                    b.HasIndex("ResourcesCostId");
-
-                    b.HasIndex("ResourcesProductionPerMinuteId");
-
-                    b.ToTable("BuildingLevel", "mas");
-                });
-
             modelBuilder.Entity("api.Models.MilitaryUnit", b =>
                 {
                     b.Property<Guid>("Id")
@@ -166,29 +136,6 @@ namespace api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("MilitaryUnit", "mas");
-                });
-
-            modelBuilder.Entity("api.Models.Resources", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Gold")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Iron")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Wheat")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Wood")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Resources", "mas");
                 });
 
             modelBuilder.Entity("api.Models.User", b =>
@@ -246,14 +193,14 @@ namespace api.Migrations
                 {
                     b.HasBaseType("api.Models.Building");
 
-                    b.HasDiscriminator().HasValue(0);
+                    b.HasDiscriminator().HasValue("Barracks");
                 });
 
             modelBuilder.Entity("api.Models.BuildingResources", b =>
                 {
                     b.HasBaseType("api.Models.Building");
 
-                    b.HasDiscriminator().HasValue(1);
+                    b.HasDiscriminator().HasValue("Resources");
                 });
 
             modelBuilder.Entity("Assistant", b =>
@@ -303,31 +250,6 @@ namespace api.Migrations
                     b.Navigation("Building");
 
                     b.Navigation("Village");
-                });
-
-            modelBuilder.Entity("api.Models.BuildingLevel", b =>
-                {
-                    b.HasOne("api.Models.Building", "Building")
-                        .WithMany()
-                        .HasForeignKey("BuildingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("api.Models.Resources", "ResourcesCost")
-                        .WithMany()
-                        .HasForeignKey("ResourcesCostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("api.Models.Resources", "ResourcesProductionPerMinute")
-                        .WithMany()
-                        .HasForeignKey("ResourcesProductionPerMinuteId");
-
-                    b.Navigation("Building");
-
-                    b.Navigation("ResourcesCost");
-
-                    b.Navigation("ResourcesProductionPerMinute");
                 });
 
             modelBuilder.Entity("api.Models.Village", b =>

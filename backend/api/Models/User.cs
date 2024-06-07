@@ -10,7 +10,7 @@ namespace api.Models;
 public class User
 {
     public Guid Id { get; init; }
-    public string Username { get; init; }
+    public string Username { get; init; } = null!;
     public string PasswordHash { get; private set; } = null!;
     public string? JwtToken { get; private set; }
 

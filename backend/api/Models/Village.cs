@@ -9,7 +9,8 @@ public class Village
 
     public Guid OwnerId { get; init; }
     public User Owner { get; init; } = null!;
-    public List<User> Assistants { get; private set; } = [];
+    public ICollection<User> Assistants { get; private set; } = [];
+    public ICollection<BuildingInVillage> Buildings { get; private set; } = new List<BuildingInVillage>();
 
     public static Village CreateVillage(string name, User owner)
     {
