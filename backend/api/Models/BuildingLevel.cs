@@ -5,21 +5,21 @@ public class BuildingLevel
     public Guid Id { get; init; }
     public int Level { get; init; }
     public int BuildingTimeInSeconds { get; init; }
-    public int? TrainingTimeShortenedInSeconds { get; init; }
+    public int? TrainingTimeShortenedPercentage { get; init; }
 
     public Resources ResourcesCost { get; init; } = null!;
     public Resources? ResourcesProductionPerMinute { get; init; }
     public Building Building { get; init; } = null!;
 
-    public int GetTrainingShortenedTimeInSeconds()
+    public int GetTrainingShortenedTimePercentage()
     {
         if (this.Building.Type == BuildingType.Barracks)
         {
-            if (!this.TrainingTimeShortenedInSeconds.HasValue)
+            if (!this.TrainingTimeShortenedPercentage.HasValue)
                 throw new InvalidOperationException(
-                    "For building type barracks, TrainingTimeShortenedInSeconds has to be set");
+                    "For building type barracks, TrainingTimeShortenedPercentage has to be set");
 
-            return this.TrainingTimeShortenedInSeconds.Value;
+            return this.TrainingTimeShortenedPercentage.Value;
         }
 
         throw new InvalidOperationException("Building type has to be barracks");

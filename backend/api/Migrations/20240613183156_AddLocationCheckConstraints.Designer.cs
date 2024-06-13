@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using api.DataAccess;
 
@@ -11,9 +12,11 @@ using api.DataAccess;
 namespace api.Migrations
 {
     [DbContext(typeof(CoreDbContext))]
-    partial class CoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240613183156_AddLocationCheckConstraints")]
+    partial class AddLocationCheckConstraints
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -102,10 +105,7 @@ namespace api.Migrations
 
                     b.HasIndex("VillageId");
 
-                    b.ToTable("BuildingInVillage", "mas", t =>
-                        {
-                            t.HasCheckConstraint("CK_BuildingInVillage_BuildingSpot", "BuildingSpot >= 0 AND BuildingSpot <= 9");
-                        });
+                    b.ToTable("BuildingInVillage", "mas");
                 });
 
             modelBuilder.Entity("api.Models.BuildingLevel", b =>
@@ -129,7 +129,7 @@ namespace api.Migrations
                     b.Property<Guid?>("ResourcesProductionPerMinuteId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("TrainingTimeShortenedPercentage")
+                    b.Property<int?>("TrainingTimeShortenedInSeconds")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -140,10 +140,7 @@ namespace api.Migrations
 
                     b.HasIndex("ResourcesProductionPerMinuteId");
 
-                    b.ToTable("BuildingLevel", "mas", t =>
-                        {
-                            t.HasCheckConstraint("CK_BuildingLevel_TrainingTimeShortenedPercentage", "TrainingTimeShortenedPercentage >= 0 AND TrainingTimeShortenedPercentage < 100");
-                        });
+                    b.ToTable("BuildingLevel", "mas");
                 });
 
             modelBuilder.Entity("api.Models.BuildingsQueue", b =>

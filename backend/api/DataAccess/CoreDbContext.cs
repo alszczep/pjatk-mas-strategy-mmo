@@ -30,6 +30,7 @@ public class CoreDbContext : DbContext
     public DbSet<BuildingsQueue> BuildingsQueue { get; set; } = null!;
     public DbSet<MilitaryUnitsQueue> MilitaryUnitsQueue { get; set; } = null!;
     public DbSet<MilitaryUnitsInVillage> MilitaryUnitsInVillage { get; set; } = null!;
+    public DbSet<Location> Locations { get; set; } = null!;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -51,6 +52,7 @@ public class CoreDbContext : DbContext
             entity.Property(e => e.Username).HasMaxLength(120).IsRequired();
             entity.Property(e => e.PasswordHash).IsRequired();
             entity.Property(e => e.JwtToken);
+
             entity.HasOne(e => e.OwnedVillage).WithOne(e => e.Owner).HasForeignKey<Village>(e => e.OwnerId)
                 .IsRequired();
             entity.HasMany(e => e.AssistedVillages).WithMany(e => e.Assistants)
@@ -70,6 +72,10 @@ public class CoreDbContext : DbContext
             entity.Property(e => e.Name).HasMaxLength(120).IsRequired();
             entity.Property(e => e.CrestImageUrl);
             entity.Property(e => e.CreationDateTime).IsRequired();
+            entity.Property(e => e.PositionX).IsRequired();
+            entity.Property(e => e.PositionY).IsRequired();
+
+            entity.HasIndex(e => new { e.PositionX, e.PositionY }).IsUnique();
 
             entity.HasOne(e => e.AvailableResources).WithOne().HasForeignKey<Resources>(e => e.Id).IsRequired();
         });
@@ -102,6 +108,15 @@ public class CoreDbContext : DbContext
 
             entity.ToTable("BuildingInVillage");
 
+            entity.Property(e => e.Level).IsRequired();
+            entity.Property(e => e.BuildingSpot).IsRequired();
+
+            entity.ToTable(t =>
+            {
+                t.HasCheckConstraint("CK_BuildingInVillage_BuildingSpot",
+                    "BuildingSpot >= 0 AND BuildingSpot <= 9");
+            });
+
             entity.HasOne(e => e.Building).WithMany(e => e.InVillages).IsRequired();
             entity.HasOne(e => e.Village).WithMany(e => e.Buildings).IsRequired();
         });
@@ -127,7 +142,13 @@ public class CoreDbContext : DbContext
 
             entity.Property(e => e.Level).IsRequired();
             entity.Property(e => e.BuildingTimeInSeconds).IsRequired();
-            entity.Property(e => e.TrainingTimeShortenedInSeconds);
+            entity.Property(e => e.TrainingTimeShortenedPercentage);
+
+            entity.ToTable(t =>
+            {
+                t.HasCheckConstraint("CK_BuildingLevel_TrainingTimeShortenedPercentage",
+                    "TrainingTimeShortenedPercentage >= 0 AND TrainingTimeShortenedPercentage < 100");
+            });
 
             entity.HasOne(e => e.ResourcesCost).WithMany().IsRequired();
             entity.HasOne(e => e.ResourcesProductionPerMinute).WithMany();
@@ -182,6 +203,33 @@ public class CoreDbContext : DbContext
 
             entity.HasOne(e => e.MilitaryUnit).WithMany().IsRequired();
             entity.HasOne(e => e.Village).WithMany().IsRequired();
+        });
+
+        modelBuilder.Entity<Location>(entity =>
+        {
+            entity.HasKey(e => new { e.PositionX, e.PositionY });
+
+            entity.ToTable("Location");
+
+            entity.Property(e => e.PositionX).IsRequired();
+            entity.Property(e => e.PositionY).IsRequired();
+            entity.Property(e => e.MilitaryUnitsDefensePercentageBonus).IsRequired();
+            entity.Property(e => e.GoldProductionBonus);
+            entity.Property(e => e.AllResourcesProductionPercentageLoss);
+
+            entity.ToTable(t =>
+            {
+                t.HasCheckConstraint("CK_Location_MilitaryUnitsDefensePercentageBonus",
+                    "MilitaryUnitsDefensePercentageBonus >= 0");
+                t.HasCheckConstraint("CK_Location_GoldProductionBonus",
+                    "GoldProductionBonus >= 0");
+                t.HasCheckConstraint("CK_Location_AllResourcesProductionPercentageLoss",
+                    "AllResourcesProductionPercentageLoss >= 0");
+            });
+
+            entity.HasOne(e => e.Village)
+                .WithOne(e => e.Location)
+                .HasForeignKey<Village>(e => new { e.PositionX, e.PositionY });
         });
     }
 }

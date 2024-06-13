@@ -10,7 +10,7 @@ public class MilitaryUnit
     public int MinBarracksLevel { get; init; }
     public ICollection<BuildingBarracks> TrainableInBarracks { get; private set; } = new List<BuildingBarracks>();
 
-    private int GetStrenght()
+    private int GetStrength()
     {
         return this.Attack + this.Defense;
     }
