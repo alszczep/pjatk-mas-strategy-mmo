@@ -7,11 +7,14 @@ public class UsersService : IUsersService
 {
     private readonly IConfiguration configuration;
     private readonly IUsersRepository usersRepository;
+    private readonly IDbTransactionRepository dbTransactionRepository;
 
-    public UsersService(IConfiguration configuration, IUsersRepository usersRepository)
+    public UsersService(IConfiguration configuration, IUsersRepository usersRepository,
+        IDbTransactionRepository dbTransactionRepository)
     {
         this.configuration = configuration;
         this.usersRepository = usersRepository;
+        this.dbTransactionRepository = dbTransactionRepository;
     }
 
     public Task<User?> GetUserByUsername(string username, CancellationToken cancellationToken)
@@ -21,7 +24,7 @@ public class UsersService : IUsersService
 
     public Task SaveChangesAsync(CancellationToken cancellationToken)
     {
-        return this.usersRepository.SaveChangesAsync(cancellationToken);
+        return this.dbTransactionRepository.SaveChangesAsync(cancellationToken);
     }
 
     public bool IsUsernameValid(string username)

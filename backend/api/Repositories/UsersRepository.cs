@@ -13,11 +13,6 @@ public class UsersRepository : IUsersRepository
         this.coreDbContext = coreDbContext;
     }
 
-    public Task SaveChangesAsync(CancellationToken cancellationToken)
-    {
-        return this.coreDbContext.SaveChangesAsync(cancellationToken);
-    }
-
     public Task<User?> GetUserByUsername(string username, CancellationToken cancellationToken)
     {
         return this.coreDbContext.Users.FirstOrDefaultAsync(u => u.Username == username, cancellationToken);

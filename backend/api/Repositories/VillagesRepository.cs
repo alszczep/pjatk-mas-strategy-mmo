@@ -13,11 +13,6 @@ public class VillagesRepository : IVillagesRepository
         this.coreDbContext = coreDbContext;
     }
 
-    public Task SaveChangesAsync(CancellationToken cancellationToken)
-    {
-        return this.coreDbContext.SaveChangesAsync(cancellationToken);
-    }
-
     public void AddVillage(Village village)
     {
         this.coreDbContext.Villages.Add(village);
@@ -25,11 +20,33 @@ public class VillagesRepository : IVillagesRepository
 
     public Task<Village?> GetVillageById(Guid id, CancellationToken cancellationToken)
     {
-        return this.coreDbContext.Villages.FirstOrDefaultAsync(v => v.Id == id, cancellationToken);
+        return this.coreDbContext.Villages
+            .Where(v => v.Id == id)
+            .Include(v => v.Buildings)
+            .ThenInclude(b => b.Building)
+            .Include(v => v.Buildings)
+            .ThenInclude(v => v.BuildingQueue)
+            .Include(v => v.MilitaryUnits)
+            .ThenInclude(m => m.MilitaryUnit)
+            .Include(v => v.MilitaryUnitsQueue)
+            .ThenInclude(m => m.MilitaryUnit)
+            .Include(v => v.AvailableResources)
+            .FirstOrDefaultAsync(cancellationToken);
     }
 
     public Task<Village?> GetVillageByUserId(Guid userId, CancellationToken cancellationToken)
     {
-        return this.coreDbContext.Villages.FirstOrDefaultAsync(v => v.OwnerId == userId, cancellationToken);
+        return this.coreDbContext.Villages
+            .Where(v => v.OwnerId == userId)
+            .Include(v => v.Buildings)
+            .ThenInclude(b => b.Building)
+            .Include(v => v.Buildings)
+            .ThenInclude(v => v.BuildingQueue)
+            .Include(v => v.MilitaryUnits)
+            .ThenInclude(m => m.MilitaryUnit)
+            .Include(v => v.MilitaryUnitsQueue)
+            .ThenInclude(m => m.MilitaryUnit)
+            .Include(v => v.AvailableResources)
+            .FirstOrDefaultAsync(cancellationToken);
     }
 }

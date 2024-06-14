@@ -6,15 +6,17 @@ namespace api.Services;
 public class VillagesService : IVillagesService
 {
     private readonly IVillagesRepository villagesRepository;
+    private readonly IDbTransactionRepository dbTransactionRepository;
 
-    public VillagesService(IVillagesRepository villagesRepository)
+    public VillagesService(IVillagesRepository villagesRepository, IDbTransactionRepository dbTransactionRepository)
     {
         this.villagesRepository = villagesRepository;
+        this.dbTransactionRepository = dbTransactionRepository;
     }
 
     public Task SaveChangesAsync(CancellationToken cancellationToken)
     {
-        return this.villagesRepository.SaveChangesAsync(cancellationToken);
+        return this.dbTransactionRepository.SaveChangesAsync(cancellationToken);
     }
 
     public void CreateVillage(string villageName, User owner)
