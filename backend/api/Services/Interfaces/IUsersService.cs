@@ -1,6 +1,6 @@
 using api.Models;
 
-namespace api.Services;
+namespace api.Services.Interfaces;
 
 public interface IUsersService
 {

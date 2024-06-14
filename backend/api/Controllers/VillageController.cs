@@ -1,9 +1,10 @@
 using api.Controllers.DTOs;
 using api.Models;
 using api.Services;
+using api.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using IAuthorizationService = api.Services.IAuthorizationService;
+using IAuthorizationService = api.Services.Interfaces.IAuthorizationService;
 
 namespace api.Controllers;
 

@@ -1,6 +1,6 @@
 using api.Models;
 
-namespace api.Repositories;
+namespace api.Repositories.Interfaces;
 
 public interface IBuildingsQueueRepository
 {
