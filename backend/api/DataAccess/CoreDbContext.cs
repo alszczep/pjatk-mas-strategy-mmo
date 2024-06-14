@@ -152,6 +152,7 @@ public class CoreDbContext : DbContext
 
             entity.HasOne(e => e.ResourcesCost).WithMany().IsRequired();
             entity.HasOne(e => e.ResourcesProductionPerMinute).WithMany();
+            entity.HasOne(e => e.Building).WithMany(e => e.Levels).IsRequired();
         });
 
         modelBuilder.Entity<Resources>(entity =>

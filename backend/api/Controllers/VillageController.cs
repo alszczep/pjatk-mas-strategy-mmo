@@ -22,31 +22,31 @@ public class VillageController : ControllerBase
     }
 
     [HttpGet("byVillageId/{id}")]
-    public async Task<ActionResult<VillageDTO?>> GetVillageByVillageId([FromQuery] Guid villageId,
+    public async Task<ActionResult<VillageDetailsDTO?>> GetVillageByVillageId([FromQuery] Guid villageId,
         CancellationToken cancellationToken)
     {
-        Village? village = await this.villagesService.GetVillageById(villageId, cancellationToken);
+        VillageDetailsDTO? village = await this.villagesService.GetVillageById(villageId, cancellationToken);
 
         if (village == null) return this.NotFound();
 
-        return new VillageDTO
+        return new VillageDetailsDTO
         {
             Name = village.Name
         };
     }
 
     [HttpGet("byOwner")]
-    public async Task<ActionResult<VillageDTO>> GetVillageByOwner(CancellationToken cancellationToken)
+    public async Task<ActionResult<VillageDetailsDTO>> GetVillageByOwner(CancellationToken cancellationToken)
     {
         var userId = this.authorizationService.ExtractUserId(this.Request);
 
         if (!userId.HasValue) return this.Unauthorized();
 
-        Village? village = await this.villagesService.GetVillageByUserId(userId.Value, cancellationToken);
+        VillageDetailsDTO? village = await this.villagesService.GetVillageByUserId(userId.Value, cancellationToken);
 
         if (village == null) return this.Unauthorized();
 
-        return new VillageDTO
+        return new VillageDetailsDTO
         {
             Name = village.Name
         };

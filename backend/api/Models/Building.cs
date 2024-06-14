@@ -10,6 +10,7 @@ public abstract class Building
     public BuildingType Type { get; init; }
 
     public ICollection<BuildingInVillage> InVillages { get; private set; } = new List<BuildingInVillage>();
+    public ICollection<BuildingLevel> Levels { get; private set; } = new List<BuildingLevel>();
 }
 
 public enum BuildingType

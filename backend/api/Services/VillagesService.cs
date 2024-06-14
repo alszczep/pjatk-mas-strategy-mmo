@@ -1,3 +1,4 @@
+using api.Controllers.DTOs;
 using api.Models;
 using api.Repositories;
 
@@ -25,13 +26,91 @@ public class VillagesService : IVillagesService
         this.villagesRepository.AddVillage(village);
     }
 
-    public Task<Village?> GetVillageById(Guid id, CancellationToken cancellationToken)
+    private VillageDetailsDTO? MapVillageToDTO(Village? village)
     {
-        return this.villagesRepository.GetVillageById(id, cancellationToken);
+        if (village == null) return null;
+
+        return new VillageDetailsDTO
+        {
+            Id = village.Id,
+            Name = village.Name,
+            CrestImageUrl = village.CrestImageUrl,
+            MilitaryUnits = village.MilitaryUnits.Select(militaryUnit => new VillageDetailsMilitaryUnitDTO
+            {
+                Id = militaryUnit.Id,
+                Name = militaryUnit.MilitaryUnit.Name,
+                Amount = militaryUnit.Amount,
+                IconUrl = militaryUnit.MilitaryUnit.IconUrl
+            }).ToList(),
+            Buildings = village.Buildings.Select(building => new VillageDetailsBuildingDTO
+            {
+                Id = building.Id,
+                Name = building.Building.Name,
+                Level = building.Level,
+                ImageUrl = building.Building.ImageUrl
+            }).ToList(),
+            AvailableResources = new VillageDetailsResourcesDTO
+            {
+                Wood = village.AvailableResources.Wood,
+                Iron = village.AvailableResources.Iron,
+                Wheat = village.AvailableResources.Wheat,
+                Gold = village.AvailableResources.Gold
+            },
+            ResourcesProductionPerMinute =
+                village.Buildings.Select(b =>
+                        new
+                        {
+                            Level = b.Level,
+                            Building = b.Building
+                        }
+                    ).Where(b => b.Building.Type == BuildingType.Resources)
+                    .Select(b => b.Building.Levels.FirstOrDefault(bl => bl.Level == b.Level))
+                    .Where(bl => bl is { ResourcesProductionPerMinute: not null })
+                    .Aggregate(new VillageDetailsResourcesDTO()
+                    {
+                        Wood = 0,
+                        Iron = 0,
+                        Wheat = 0,
+                        Gold = 0
+                    }, (acc, bl) =>
+                    {
+                        acc.Wood += bl.ResourcesProductionPerMinute.Wood;
+                        acc.Iron += bl.ResourcesProductionPerMinute.Iron;
+                        acc.Wheat += bl.ResourcesProductionPerMinute.Wheat;
+                        acc.Gold += bl.ResourcesProductionPerMinute.Gold;
+                        return acc;
+                    }),
+            MilitaryUnitsQueue = village.MilitaryUnitsQueue.Select(mu => new VillageDetailsMilitaryUnitQueueDTO
+            {
+                Id = mu.Id,
+                MilitaryUnitName = mu.MilitaryUnit.Name,
+                Amount = mu.Amount,
+                StartTime = mu.StartTime,
+                EndTime = mu.EndTime
+            }).ToList(),
+            BuildingsQueue = village.Buildings.Select(b => new
+                {
+                    Name = b.Building.Name,
+                    Queue = b.BuildingQueue
+                })
+                .SelectMany(b => b.Queue.Select(q => new VillageDetailsBuildingQueueDTO
+                {
+                    Id = q.Id,
+                    BuildingName = b.Name,
+                    ToLevel = q.LevelAfterUpgrade,
+                    StartTime = q.StartTime,
+                    EndTime = q.EndTime
+                })).ToList()
+        };
     }
 
-    public Task<Village?> GetVillageByUserId(Guid userId, CancellationToken cancellationToken)
+    public async Task<VillageDetailsDTO?> GetVillageById(Guid id, CancellationToken cancellationToken)
     {
-        return this.villagesRepository.GetVillageByUserId(userId, cancellationToken);
+        return this.MapVillageToDTO(await this.villagesRepository.GetVillageById(id, cancellationToken));
+    }
+
+    public async Task<VillageDetailsDTO?> GetVillageByUserId(Guid userId, CancellationToken cancellationToken)
+    {
+        return this.MapVillageToDTO(await this.villagesRepository.GetVillageByUserId(userId, cancellationToken));
     }
 }

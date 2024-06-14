@@ -18,12 +18,12 @@ public class VillagesRepository : IVillagesRepository
         this.coreDbContext.Villages.Add(village);
     }
 
-    public Task<Village?> GetVillageById(Guid id, CancellationToken cancellationToken)
+    private async Task<Village?> HandleVillageIncludes(IQueryable<Village> query, CancellationToken cancellationToken)
     {
-        return this.coreDbContext.Villages
-            .Where(v => v.Id == id)
+        return await query
             .Include(v => v.Buildings)
             .ThenInclude(b => b.Building)
+            .ThenInclude(b => b.Levels)
             .Include(v => v.Buildings)
             .ThenInclude(v => v.BuildingQueue)
             .Include(v => v.MilitaryUnits)
@@ -34,19 +34,15 @@ public class VillagesRepository : IVillagesRepository
             .FirstOrDefaultAsync(cancellationToken);
     }
 
+    public Task<Village?> GetVillageById(Guid id, CancellationToken cancellationToken)
+    {
+        return this.HandleVillageIncludes(this.coreDbContext.Villages
+            .Where(v => v.Id == id), cancellationToken);
+    }
+
     public Task<Village?> GetVillageByUserId(Guid userId, CancellationToken cancellationToken)
     {
-        return this.coreDbContext.Villages
-            .Where(v => v.OwnerId == userId)
-            .Include(v => v.Buildings)
-            .ThenInclude(b => b.Building)
-            .Include(v => v.Buildings)
-            .ThenInclude(v => v.BuildingQueue)
-            .Include(v => v.MilitaryUnits)
-            .ThenInclude(m => m.MilitaryUnit)
-            .Include(v => v.MilitaryUnitsQueue)
-            .ThenInclude(m => m.MilitaryUnit)
-            .Include(v => v.AvailableResources)
-            .FirstOrDefaultAsync(cancellationToken);
+        return this.HandleVillageIncludes(this.coreDbContext.Villages
+            .Where(v => v.OwnerId == userId), cancellationToken);
     }
 }

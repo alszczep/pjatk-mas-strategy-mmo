@@ -1,6 +1,5 @@
 using api.DataAccess;
 using api.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace api.Repositories;
 

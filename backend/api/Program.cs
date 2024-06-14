@@ -45,12 +45,16 @@ builder.Services.AddAuthentication(options =>
 });
 builder.Services.AddAuthorization();
 
+builder.Services.AddScoped<IBuildingsInVillageRepository, BuildingsInVillageRepository>();
+builder.Services.AddScoped<IBuildingsQueueRepository, BuildingsQueueRepository>();
+builder.Services.AddScoped<IBuildingsRepository, BuildingsRepository>();
+builder.Services.AddScoped<IDbTransactionRepository, DbTransactionRepository>();
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
-builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<IVillagesRepository, VillagesRepository>();
-builder.Services.AddScoped<IVillagesService, VillagesService>();
-builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
 
+builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
+builder.Services.AddScoped<IUsersService, UsersService>();
+builder.Services.AddScoped<IVillagesService, VillagesService>();
 
 WebApplication app = builder.Build();
 
