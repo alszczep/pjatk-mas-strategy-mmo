@@ -6,10 +6,12 @@ namespace api.DataAccess;
 public class CoreDbContext : DbContext
 {
     private readonly IConfiguration configuration;
+    private readonly Uri webAppUrl;
 
     public CoreDbContext(IConfiguration configuration)
     {
         this.configuration = configuration;
+        this.webAppUrl = new Uri(configuration["WebAppUrl"]);
     }
 
     // public CoreDbContext(DbContextOptions<DbContext> options, IConfiguration configuration)
@@ -93,6 +95,8 @@ public class CoreDbContext : DbContext
             entity.HasDiscriminator(e => e.Type)
                 .HasValue<BuildingBarracks>(BuildingType.Barracks)
                 .HasValue<BuildingResources>(BuildingType.Resources);
+
+            entity.HasData(Seed.GetBuildingsSeed(this.webAppUrl));
         });
 
         modelBuilder.Entity<BuildingBarracks>(entity =>
@@ -132,6 +136,8 @@ public class CoreDbContext : DbContext
             entity.Property(e => e.Defense).IsRequired();
             entity.Property(e => e.IconUrl);
             entity.Property(e => e.MinBarracksLevel).IsRequired();
+
+            entity.HasOne(e => e.TrainingCost).WithOne().HasForeignKey<Resources>(e => e.Id).IsRequired();
         });
 
         modelBuilder.Entity<BuildingLevel>(entity =>
@@ -150,8 +156,9 @@ public class CoreDbContext : DbContext
                     "TrainingTimeShortenedPercentage >= 0 AND TrainingTimeShortenedPercentage < 100");
             });
 
-            entity.HasOne(e => e.ResourcesCost).WithMany().IsRequired();
-            entity.HasOne(e => e.ResourcesProductionPerMinute).WithMany();
+            entity.HasOne(e => e.ResourcesCost).WithOne().HasForeignKey<Resources>(e => e.Id).IsRequired();
+            ;
+            entity.HasOne(e => e.ResourcesProductionPerMinute).WithOne().HasForeignKey<Resources>(e => e.Id);
             entity.HasOne(e => e.Building).WithMany(e => e.Levels).IsRequired();
         });
 
@@ -231,6 +238,8 @@ public class CoreDbContext : DbContext
             entity.HasOne(e => e.Village)
                 .WithOne(e => e.Location)
                 .HasForeignKey<Village>(e => new { e.PositionX, e.PositionY });
+
+            entity.HasData(Seed.GetLocationsSeed());
         });
     }
 }
