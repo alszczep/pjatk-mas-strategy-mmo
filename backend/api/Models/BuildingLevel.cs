@@ -7,8 +7,11 @@ public class BuildingLevel
     public int BuildingTimeInSeconds { get; init; }
     public int? TrainingTimeShortenedPercentage { get; init; }
 
+    public Guid ResourcesCostId { get; init; }
     public Resources ResourcesCost { get; init; } = null!;
+    public Guid? ResourcesProductionPerMinuteId { get; init; }
     public Resources? ResourcesProductionPerMinute { get; init; }
+    public Guid BuildingId { get; init; }
     public Building Building { get; init; } = null!;
 
     public int GetTrainingShortenedTimePercentage()

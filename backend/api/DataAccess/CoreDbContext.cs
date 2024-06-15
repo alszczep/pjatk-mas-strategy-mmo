@@ -1,4 +1,5 @@
 using api.Models;
+using Microsoft.AspNetCore.Authentication.OAuth.Claims;
 using Microsoft.EntityFrameworkCore;
 
 namespace api.DataAccess;
@@ -60,8 +61,9 @@ public class CoreDbContext : DbContext
             entity.HasMany(e => e.AssistedVillages).WithMany(e => e.Assistants)
                 .UsingEntity<Dictionary<string, object>>(
                     "Assistant",
-                    j => j.HasOne<Village>().WithMany().HasForeignKey("Id").OnDelete(DeleteBehavior.ClientCascade),
-                    j => j.HasOne<User>().WithMany().HasForeignKey("Id").OnDelete(DeleteBehavior.ClientCascade)
+                    j => j.HasOne<Village>().WithMany().HasForeignKey("VillageId")
+                        .OnDelete(DeleteBehavior.ClientCascade),
+                    j => j.HasOne<User>().WithMany().HasForeignKey("UserId").OnDelete(DeleteBehavior.ClientCascade)
                 );
         });
 
@@ -76,10 +78,11 @@ public class CoreDbContext : DbContext
             entity.Property(e => e.CreationDateTime).IsRequired();
             entity.Property(e => e.PositionX).IsRequired();
             entity.Property(e => e.PositionY).IsRequired();
+            entity.Property(e => e.AvailableResourcesId).IsRequired();
 
             entity.HasIndex(e => new { e.PositionX, e.PositionY }).IsUnique();
 
-            entity.HasOne(e => e.AvailableResources).WithOne().HasForeignKey<Resources>(e => e.Id).IsRequired();
+            // entity.HasOne(e => e.AvailableResources).WithOne().HasForeignKey<Resources>(e => e.Id).IsRequired();
         });
 
         modelBuilder.Entity<Building>(entity =>
@@ -95,16 +98,29 @@ public class CoreDbContext : DbContext
             entity.HasDiscriminator(e => e.Type)
                 .HasValue<BuildingBarracks>(BuildingType.Barracks)
                 .HasValue<BuildingResources>(BuildingType.Resources);
-
-            entity.HasData(Seed.GetBuildingsSeed(this.webAppUrl));
         });
 
         modelBuilder.Entity<BuildingBarracks>(entity =>
         {
-            entity.HasMany(e => e.TrainableUnits).WithMany(e => e.TrainableInBarracks);
+            entity.HasMany(e => e.TrainableUnits).WithMany(e => e.TrainableInBarracks)
+                .UsingEntity<Dictionary<string, object>>(
+                    "MilitaryUnitTrainableInBarracks",
+                    j => j.HasOne<MilitaryUnit>().WithMany().HasForeignKey("MilitaryUnitId").HasPrincipalKey(e => e.Id)
+                        .OnDelete(DeleteBehavior.ClientCascade),
+                    j => j.HasOne<BuildingBarracks>().WithMany().HasForeignKey("BuildingBarracksId")
+                        .HasPrincipalKey(e => e.Id)
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                ).HasData(
+                    Seed.GetMilitaryUnitTrainableInBarracksSeed()
+                );
+
+            entity.HasData(Seed.GetBuildingsBarracksSeed(this.webAppUrl));
         });
 
-        modelBuilder.Entity<BuildingResources>(entity => { });
+        modelBuilder.Entity<BuildingResources>(entity =>
+        {
+            entity.HasData(Seed.GetBuildingsResourcesSeed(this.webAppUrl));
+        });
 
         modelBuilder.Entity<BuildingInVillage>(entity =>
         {
@@ -136,8 +152,12 @@ public class CoreDbContext : DbContext
             entity.Property(e => e.Defense).IsRequired();
             entity.Property(e => e.IconUrl);
             entity.Property(e => e.MinBarracksLevel).IsRequired();
+            entity.Property(e => e.TrainingTimeInSeconds).IsRequired();
 
-            entity.HasOne(e => e.TrainingCost).WithOne().HasForeignKey<Resources>(e => e.Id).IsRequired();
+            // entity.HasOne(e => e.TrainingCost).WithOne().HasForeignKey<Resources>(e => e.Id)
+            //     .HasPrincipalKey<MilitaryUnit>(e => e.TrainingCostId).IsRequired();
+
+            entity.HasData(Seed.GetMilitaryUnitsSeed(this.webAppUrl));
         });
 
         modelBuilder.Entity<BuildingLevel>(entity =>
@@ -149,6 +169,9 @@ public class CoreDbContext : DbContext
             entity.Property(e => e.Level).IsRequired();
             entity.Property(e => e.BuildingTimeInSeconds).IsRequired();
             entity.Property(e => e.TrainingTimeShortenedPercentage);
+            entity.Property(e => e.BuildingId).IsRequired();
+            entity.Property(e => e.ResourcesCostId).IsRequired();
+            entity.Property(e => e.ResourcesProductionPerMinuteId);
 
             entity.ToTable(t =>
             {
@@ -156,10 +179,13 @@ public class CoreDbContext : DbContext
                     "TrainingTimeShortenedPercentage >= 0 AND TrainingTimeShortenedPercentage < 100");
             });
 
-            entity.HasOne(e => e.ResourcesCost).WithOne().HasForeignKey<Resources>(e => e.Id).IsRequired();
-            ;
-            entity.HasOne(e => e.ResourcesProductionPerMinute).WithOne().HasForeignKey<Resources>(e => e.Id);
-            entity.HasOne(e => e.Building).WithMany(e => e.Levels).IsRequired();
+            // entity.HasOne(e => e.ResourcesCost).WithOne().HasForeignKey<Resources>(e => e.Id)
+            //     .HasPrincipalKey<BuildingLevel>(e => e.ResourcesCostId).IsRequired();
+            // entity.HasOne(e => e.ResourcesProductionPerMinute).WithOne().HasForeignKey<Resources>(e => e.Id)
+            //     .HasPrincipalKey<BuildingLevel>(e => e.ResourcesProductionPerMinuteId);
+            entity.HasOne(e => e.Building).WithMany(e => e.Levels).HasForeignKey(e => e.BuildingId).IsRequired();
+
+            entity.HasData(Seed.GetBuildingLevelsSeed());
         });
 
         modelBuilder.Entity<Resources>(entity =>
@@ -172,6 +198,16 @@ public class CoreDbContext : DbContext
             entity.Property(e => e.Iron).IsRequired();
             entity.Property(e => e.Wheat).IsRequired();
             entity.Property(e => e.Gold).IsRequired();
+
+            entity.HasMany<BuildingLevel>().WithOne(e => e.ResourcesCost)
+                .HasForeignKey(e => e.ResourcesCostId);
+            entity.HasMany<BuildingLevel>().WithOne(e => e.ResourcesProductionPerMinute)
+                .HasForeignKey(e => e.ResourcesProductionPerMinuteId);
+            entity.HasMany<Village>().WithOne(e => e.AvailableResources).HasForeignKey(e => e.AvailableResourcesId)
+                .OnDelete(DeleteBehavior.ClientCascade);
+            entity.HasMany<MilitaryUnit>().WithOne(e => e.TrainingCost).HasForeignKey(e => e.TrainingCostId);
+
+            entity.HasData(Seed.GetResourcesSeed());
         });
 
         modelBuilder.Entity<BuildingsQueue>(entity =>
