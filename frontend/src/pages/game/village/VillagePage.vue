@@ -13,9 +13,12 @@
   import WholePageLoader from "../../../components/common/WholePageLoader.vue"
   import TroopsList from "../../../components/village/TroopsList.vue"
   import type { VillageDetailsDTO } from "../../../api/dtos/VillageDetailsDTO"
+  import { useToast } from "vue-toast-notification"
 
   const route = useRoute()
   const villageId = route.params[routes.game.village.param] as string
+
+  const $toast = useToast()
 
   const village = ref<VillageDetailsDTO>()
 
@@ -42,7 +45,12 @@
       return
     }
 
-    await updateMilitaryUnitsQueueEndpoint(villageId)
+    const response = await updateMilitaryUnitsQueueEndpoint(villageId)
+    if (response.error) {
+      $toast.error(response.error)
+      return
+    }
+
     fetchVillage()
   }
 </script>

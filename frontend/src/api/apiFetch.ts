@@ -1,12 +1,13 @@
+import { useToast } from "vue-toast-notification"
 import { authTokenKey } from "../auth"
 import { config } from "../config"
 
-export const apiFetch = async (
+export const apiFetch = async <T = undefined>(
   endpoint: string,
   method: "GET" | "POST" | "PUT" | "DELETE",
   body?: object,
   options?: RequestInit,
-) => {
+): Promise<T> => {
   const url = new URL(endpoint, config.apiBaseUrl)
   const response = await fetch(url, {
     body: body ? JSON.stringify(body) : undefined,
@@ -21,12 +22,14 @@ export const apiFetch = async (
   })
 
   if (response.status === 204) {
-    return undefined
+    return undefined as T
   }
 
-  try {
-    return await response.json()
-  } catch (error) {
-    return Promise.resolve()
+  if (response.status === 200) {
+    return (await response.json()) as T
   }
+
+  const $toast = useToast()
+  $toast.error("Network error")
+  throw new Error(JSON.stringify(response))
 }

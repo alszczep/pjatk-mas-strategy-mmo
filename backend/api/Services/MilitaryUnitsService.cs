@@ -1,3 +1,4 @@
+using api.Helpers;
 using api.Models;
 using api.Repositories.Interfaces;
 using api.Services.Interfaces;
@@ -11,31 +12,50 @@ public class MilitaryUnitsService : IMilitaryUnitsService
     private readonly IMilitaryUnitsQueueRepository militaryUnitsQueueRepository;
     private readonly IMilitaryUnitsRepository militaryUnitsRepository;
     private readonly IVillagesRepository villagesRepository;
+    private readonly ILogger<MilitaryUnitsService> logger;
 
     public MilitaryUnitsService(IDbTransactionRepository dbTransactionRepository,
         IMilitaryUnitsInVillageRepository militaryUnitsInVillageRepository,
         IMilitaryUnitsQueueRepository militaryUnitsQueueRepository,
         IMilitaryUnitsRepository militaryUnitsRepository,
-        IVillagesRepository villagesRepository)
+        IVillagesRepository villagesRepository,
+        ILogger<MilitaryUnitsService> logger)
     {
         this.dbTransactionRepository = dbTransactionRepository;
         this.militaryUnitsInVillageRepository = militaryUnitsInVillageRepository;
         this.militaryUnitsQueueRepository = militaryUnitsQueueRepository;
         this.militaryUnitsRepository = militaryUnitsRepository;
         this.villagesRepository = villagesRepository;
+        this.logger = logger;
     }
 
-    public async Task ScheduleMilitaryUnitTraining(Guid villageId, Guid militaryUnitId, int amount,
+    public async Task<ResultOrError<bool>> ScheduleMilitaryUnitTraining(Guid villageId, Guid militaryUnitId, int amount,
         CancellationToken cancellationToken)
     {
         MilitaryUnit? militaryUnit =
             await this.militaryUnitsRepository.GetMilitaryUnitById(militaryUnitId, cancellationToken);
 
-        if (militaryUnit == null) throw new InvalidOperationException("Military unit not found");
+        if (militaryUnit == null)
+        {
+            this.logger.LogError("Military unit not found");
+            return new ResultOrError<bool>()
+            {
+                Result = false,
+                Error = ResultOrError<bool>.ServerError
+            };
+        }
 
         Village? village = await this.villagesRepository.GetVillageById(villageId, cancellationToken);
 
-        if (village == null) throw new InvalidOperationException("Village not found");
+        if (village == null)
+        {
+            this.logger.LogError("Village not found");
+            return new ResultOrError<bool>()
+            {
+                Result = false,
+                Error = ResultOrError<bool>.ServerError
+            };
+        }
 
         var allBarracks = village.Buildings.Where(b => b.Building.Type == BuildingType.Barracks)
             .Select(b => new
@@ -52,12 +72,26 @@ public class MilitaryUnitsService : IMilitaryUnitsService
             l => l.Level == barracksThatCanTrainUnit.BuildingInVillage.Level);
 
         if (barracksLevel == null)
-            throw new InvalidOperationException("No barracks or barracks level too low");
+        {
+            this.logger.LogError("No barracks or barracks level too low");
+            return new ResultOrError<bool>()
+            {
+                Result = false,
+                Error = "Barracks level too low"
+            };
+        }
 
         Resources totalCost = militaryUnit.TrainingCost * amount;
 
         if (totalCost > village.AvailableResources)
-            throw new InvalidOperationException("Not enough resources");
+        {
+            this.logger.LogError("Not enough resources");
+            return new ResultOrError<bool>()
+            {
+                Result = false,
+                Error = "Not enough resources"
+            };
+        }
 
         var currentQueue =
             await this.militaryUnitsQueueRepository.GetMilitaryUnitsQueueForVillage(villageId, cancellationToken);
@@ -84,6 +118,11 @@ public class MilitaryUnitsService : IMilitaryUnitsService
         this.militaryUnitsQueueRepository.AddMilitaryUnitsQueueItem(militaryUnitsQueue);
 
         await this.dbTransactionRepository.SaveChangesAsync(cancellationToken);
+
+        return new ResultOrError<bool>()
+        {
+            Result = true
+        };
     }
 
     private async Task UpdateMilitaryUnitsQueue(List<MilitaryUnitsQueue> queue,

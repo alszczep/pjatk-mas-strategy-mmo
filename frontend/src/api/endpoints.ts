@@ -1,44 +1,42 @@
 import { apiFetch } from "./apiFetch"
-import type { TokenDTO } from "./dtos"
 import type { BuildableBuildingDTO } from "./dtos/BuildableBuildingDTO"
 import type { BuildingDetailsDTO } from "./dtos/BuildingDetailsDTO"
+import type { TokenDTO } from "./dtos/TokenDTO"
 import type { VillageDetailsDTO } from "./dtos/VillageDetailsDTO"
+import type { ResultOrError } from "./dtos/common"
 
-export const loginEndpoint = (
-  Username: string,
-  Password: string,
-): Promise<TokenDTO> => apiFetch("user/login", "POST", { Username, Password })
+export const loginEndpoint = (Username: string, Password: string) =>
+  apiFetch<TokenDTO>("user/login", "POST", { Username, Password })
 
-export const registerEndpoint = (
-  Username: string,
-  Password: string,
-): Promise<TokenDTO> =>
-  apiFetch("user/register", "POST", { Username, Password })
+export const registerEndpoint = (Username: string, Password: string) =>
+  apiFetch<TokenDTO>("user/register", "POST", { Username, Password })
 
-export const villageIdByOwnerEndpoint = (): Promise<string> =>
-  apiFetch("village/villageIdByOwner", "GET")
+export const villageIdByOwnerEndpoint = () =>
+  apiFetch<string>("village/villageIdByOwner", "GET")
 
-export const villageByIdEndpoint = (
-  villageId: string,
-): Promise<VillageDetailsDTO> =>
-  apiFetch(`village/byVillageId/${villageId}`, "GET")
+export const villageByIdEndpoint = (villageId: string) =>
+  apiFetch<VillageDetailsDTO>(`village/byVillageId/${villageId}`, "GET")
 
-export const getBuildableBuildingsEndpoint = (
-  villageId: string,
-): Promise<BuildableBuildingDTO[]> =>
-  apiFetch(`building/buildableBuildings/${villageId}`, "GET")
+export const getBuildableBuildingsEndpoint = (villageId: string) =>
+  apiFetch<BuildableBuildingDTO[]>(
+    `building/buildableBuildings/${villageId}`,
+    "GET",
+  )
 
 export const getBuildingDetailsEndpoint = (
   VillageId: string,
   BuildingSpot: number,
-): Promise<BuildingDetailsDTO | undefined> =>
-  apiFetch("building/buildingDetails", "POST", { VillageId, BuildingSpot })
+) =>
+  apiFetch<BuildingDetailsDTO | undefined>("building/buildingDetails", "POST", {
+    VillageId,
+    BuildingSpot,
+  })
 
 export const scheduleBuildingEndpoint = (
   VillageId: string,
   BuildingSpot: number,
   BuildingId: string,
-): Promise<void> =>
+) =>
   apiFetch("building/scheduleBuilding", "POST", {
     VillageId,
     BuildingSpot,
@@ -48,26 +46,28 @@ export const scheduleBuildingEndpoint = (
 export const scheduleUpgradeEndpoint = (
   VillageId: string,
   BuildingSpot: number,
-): Promise<void> =>
-  apiFetch("building/scheduleUpgrade", "POST", { VillageId, BuildingSpot })
+) => apiFetch("building/scheduleUpgrade", "POST", { VillageId, BuildingSpot })
 
-export const updateBuildingsQueueEndpoint = (
-  villageId: string,
-): Promise<void> =>
+export const updateBuildingsQueueEndpoint = (villageId: string) =>
   apiFetch(`building/updateBuildingsQueue/${villageId}`, "POST")
 
 export const scheduleMilitaryUnitTrainingEndpoint = (
   VillageId: string,
   MilitaryUnitId: string,
   Amount: number,
-): Promise<void> =>
-  apiFetch("militaryUnit/scheduleMilitaryUnitTraining", "POST", {
-    VillageId,
-    MilitaryUnitId,
-    Amount,
-  })
+) =>
+  apiFetch<ResultOrError<boolean>>(
+    "militaryUnit/scheduleMilitaryUnitTraining",
+    "POST",
+    {
+      VillageId,
+      MilitaryUnitId,
+      Amount,
+    },
+  )
 
-export const updateMilitaryUnitsQueueEndpoint = (
-  VillageId: string,
-): Promise<void> =>
-  apiFetch(`militaryUnit/updateMilitaryUnitsQueue/${VillageId}`, "POST")
+export const updateMilitaryUnitsQueueEndpoint = (VillageId: string) =>
+  apiFetch<ResultOrError<boolean>>(
+    `militaryUnit/updateMilitaryUnitsQueue/${VillageId}`,
+    "POST",
+  )

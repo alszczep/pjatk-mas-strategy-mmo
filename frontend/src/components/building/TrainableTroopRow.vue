@@ -15,19 +15,24 @@
 
   const $toast = useToast()
 
-  const train = () => {
+  const train = async () => {
     if (!amount.value) {
       $toast.error("Amount is incorrect")
       return
     }
-    scheduleMilitaryUnitTrainingEndpoint(
+    const response = await scheduleMilitaryUnitTrainingEndpoint(
       villageId,
       troop.id,
       amount.value,
-    ).then(() => {
-      $toast.success("Troops training scheduled")
-      router.push(routes.game.village.withParam(villageId))
-    })
+    )
+
+    if (response.error) {
+      $toast.error(response.error)
+      return
+    }
+
+    $toast.success("Troops training scheduled")
+    router.push(routes.game.village.withParam(villageId))
   }
 </script>
 

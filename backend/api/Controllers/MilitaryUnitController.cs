@@ -1,4 +1,5 @@
 using api.Controllers.DTOs;
+using api.Helpers;
 using api.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,17 +23,28 @@ public class MilitaryUnitController : ControllerBase
     }
 
     [HttpPost("scheduleMilitaryUnitTraining")]
-    public async Task<ActionResult> ScheduleBuilding(
+    public async Task<ActionResult<ResultOrError<bool>>> ScheduleBuilding(
         [FromBody] MilitaryUnitParametersDTO dto, CancellationToken cancellationToken)
     {
-        await this.militaryUnitsService.ScheduleMilitaryUnitTraining(dto.VillageId, dto.MilitaryUnitId, dto.Amount,
-            cancellationToken);
-
-        return this.Ok();
+        try
+        {
+            return await this.militaryUnitsService.ScheduleMilitaryUnitTraining(dto.VillageId, dto.MilitaryUnitId,
+                dto.Amount,
+                cancellationToken);
+        }
+        catch (Exception e)
+        {
+            return new ResultOrError<bool>()
+            {
+                Result = false,
+                Error = ResultOrError<bool>.ServerError
+            };
+        }
     }
 
     [HttpPost("updateMilitaryUnitsQueue/{villageId}")]
-    public async Task<ActionResult> UpdateBuildingsQueue(Guid villageId, CancellationToken cancellationToken)
+    public async Task<ActionResult<ResultOrError<bool>>> UpdateBuildingsQueue(Guid villageId,
+        CancellationToken cancellationToken)
     {
         await this.militaryUnitsService.UpdateMilitaryUnitsQueueForVillage(villageId, cancellationToken);
 
