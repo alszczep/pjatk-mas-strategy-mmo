@@ -1,3 +1,4 @@
+using api.Controllers.DTOs;
 using api.DataAccess;
 using api.Models;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +26,7 @@ public class VillagesRepository : IVillagesRepository
             .Include(v => v.Buildings)
             .ThenInclude(b => b.Building)
             .ThenInclude(b => b.Levels)
+            .ThenInclude(l => l.ResourcesProductionPerMinute)
             .Include(v => v.Buildings)
             .ThenInclude(v => v.BuildingQueue)
             .Include(v => v.MilitaryUnits)
@@ -53,5 +55,43 @@ public class VillagesRepository : IVillagesRepository
             .Where(v => v.Id == villageId)
             .Include(r => r.AvailableResources)
             .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task UpdateResourcesGlobally(CancellationToken cancellationToken)
+    {
+        var villages = await this.coreDbContext.Villages.Include(v => v.AvailableResources)
+            .Include(v => v.Buildings)
+            .ThenInclude(b => b.Building)
+            .ThenInclude(b => b.Levels)
+            .ThenInclude(l => l.ResourcesProductionPerMinute)
+            .ToListAsync(cancellationToken);
+
+        foreach (Village village in villages)
+        {
+            Resources resources = village.Buildings.Select(b =>
+                    new
+                    {
+                        Level = b.Level,
+                        Building = b.Building
+                    }
+                ).Where(b => b.Building.Type == BuildingType.Resources)
+                .Select(b => b.Building.Levels.FirstOrDefault(bl => bl.Level == b.Level))
+                .Where(bl => bl is { ResourcesProductionPerMinute: not null })
+                .Aggregate(new Resources()
+                {
+                    Wood = 0,
+                    Iron = 0,
+                    Wheat = 0,
+                    Gold = 0
+                }, (acc, bl) =>
+                {
+                    acc += bl.ResourcesProductionPerMinute;
+                    return acc;
+                });
+
+            village.AvailableResources += resources;
+        }
+
+        await this.coreDbContext.SaveChangesAsync(cancellationToken);
     }
 }

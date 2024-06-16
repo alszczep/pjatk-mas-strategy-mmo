@@ -58,7 +58,7 @@ public class VillagesService : IVillagesService
                 Wheat = village.AvailableResources.Wheat,
                 Gold = village.AvailableResources.Gold
             },
-            ResourcesProductionPerMinute =
+            ResourcesProductionPerMinute = ResourcesDTO.ResourcesToDTO(
                 village.Buildings.Select(b =>
                         new
                         {
@@ -68,7 +68,7 @@ public class VillagesService : IVillagesService
                     ).Where(b => b.Building.Type == BuildingType.Resources)
                     .Select(b => b.Building.Levels.FirstOrDefault(bl => bl.Level == b.Level))
                     .Where(bl => bl is { ResourcesProductionPerMinute: not null })
-                    .Aggregate(new ResourcesDTO
+                    .Aggregate(new Resources
                     {
                         Wood = 0,
                         Iron = 0,
@@ -76,12 +76,9 @@ public class VillagesService : IVillagesService
                         Gold = 0
                     }, (acc, bl) =>
                     {
-                        acc.Wood += bl.ResourcesProductionPerMinute.Wood;
-                        acc.Iron += bl.ResourcesProductionPerMinute.Iron;
-                        acc.Wheat += bl.ResourcesProductionPerMinute.Wheat;
-                        acc.Gold += bl.ResourcesProductionPerMinute.Gold;
+                        acc += bl.ResourcesProductionPerMinute;
                         return acc;
-                    }),
+                    })),
             MilitaryUnitsQueue = village.MilitaryUnitsQueue.Select(mu => new VillageDetailsMilitaryUnitQueueDTO
             {
                 Id = mu.Id,
@@ -114,5 +111,10 @@ public class VillagesService : IVillagesService
     public async Task<VillageDetailsDTO?> GetVillageByUserId(Guid userId, CancellationToken cancellationToken)
     {
         return this.MapVillageToDTO(await this.villagesRepository.GetVillageByUserId(userId, cancellationToken));
+    }
+
+    public async Task UpdateResourcesGlobally(CancellationToken cancellationToken)
+    {
+        await this.villagesRepository.UpdateResourcesGlobally(cancellationToken);
     }
 }

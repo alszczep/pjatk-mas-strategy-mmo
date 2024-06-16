@@ -92,6 +92,7 @@ public class CoreDbContext : DbContext
             entity.Property(e => e.Name).HasMaxLength(120).IsRequired();
             entity.Property(e => e.MaxInVillage).IsRequired();
             entity.Property(e => e.ImageUrl).IsRequired();
+            entity.Property(e => e.Type).IsRequired();
 
             entity.HasDiscriminator(e => e.Type)
                 .HasValue<BuildingBarracks>(BuildingType.Barracks)
@@ -152,9 +153,6 @@ public class CoreDbContext : DbContext
             entity.Property(e => e.MinBarracksLevel).IsRequired();
             entity.Property(e => e.TrainingTimeInSeconds).IsRequired();
 
-            // entity.HasOne(e => e.TrainingCost).WithOne().HasForeignKey<Resources>(e => e.Id)
-            //     .HasPrincipalKey<MilitaryUnit>(e => e.TrainingCostId).IsRequired();
-
             entity.HasData(Seed.GetMilitaryUnitsSeed(this.webAppUrl));
         });
 
@@ -177,10 +175,6 @@ public class CoreDbContext : DbContext
                     "TrainingTimeShortenedPercentage >= 0 AND TrainingTimeShortenedPercentage < 100");
             });
 
-            // entity.HasOne(e => e.ResourcesCost).WithOne().HasForeignKey<Resources>(e => e.Id)
-            //     .HasPrincipalKey<BuildingLevel>(e => e.ResourcesCostId).IsRequired();
-            // entity.HasOne(e => e.ResourcesProductionPerMinute).WithOne().HasForeignKey<Resources>(e => e.Id)
-            //     .HasPrincipalKey<BuildingLevel>(e => e.ResourcesProductionPerMinuteId);
             entity.HasOne(e => e.Building).WithMany(e => e.Levels).HasForeignKey(e => e.BuildingId).IsRequired();
 
             entity.HasData(Seed.GetBuildingLevelsSeed());
@@ -197,13 +191,18 @@ public class CoreDbContext : DbContext
             entity.Property(e => e.Wheat).IsRequired();
             entity.Property(e => e.Gold).IsRequired();
 
-            entity.HasMany<BuildingLevel>().WithOne(e => e.ResourcesCost)
-                .HasForeignKey(e => e.ResourcesCostId);
-            entity.HasMany<BuildingLevel>().WithOne(e => e.ResourcesProductionPerMinute)
-                .HasForeignKey(e => e.ResourcesProductionPerMinuteId);
-            entity.HasMany<Village>().WithOne(e => e.AvailableResources).HasForeignKey(e => e.AvailableResourcesId)
+            entity.HasOne<BuildingLevel>(e => e.ResourcesCostNavigation)
+                .WithOne(e => e.ResourcesCost)
+                .HasForeignKey<BuildingLevel>(e => e.ResourcesCostId);
+            entity.HasOne<BuildingLevel>(
+                    e => e.ResourcesProductionNavigation
+                ).WithOne(e => e.ResourcesProductionPerMinute)
+                .HasForeignKey<BuildingLevel>(e => e.ResourcesProductionPerMinuteId);
+            entity.HasOne<Village>(e => e.Village).WithOne(e => e.AvailableResources)
+                .HasForeignKey<Village>(e => e.AvailableResourcesId)
                 .OnDelete(DeleteBehavior.ClientCascade);
-            entity.HasMany<MilitaryUnit>().WithOne(e => e.TrainingCost).HasForeignKey(e => e.TrainingCostId);
+            entity.HasOne<MilitaryUnit>(e => e.MilitaryUnit).WithOne(e => e.TrainingCost)
+                .HasForeignKey<MilitaryUnit>(e => e.TrainingCostId);
 
             entity.HasData(Seed.GetResourcesSeed());
         });

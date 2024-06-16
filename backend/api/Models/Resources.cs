@@ -8,6 +8,11 @@ public class Resources
     public int Wheat { get; set; }
     public int Gold { get; set; }
 
+    public Village? Village { get; set; }
+    public MilitaryUnit? MilitaryUnit { get; set; }
+    public BuildingLevel? ResourcesCostNavigation { get; set; }
+    public BuildingLevel? ResourcesProductionNavigation { get; set; }
+
     public static Resources operator +(Resources a, Resources b)
     {
         a.Wood += b.Wood;

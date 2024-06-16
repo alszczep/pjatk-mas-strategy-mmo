@@ -8,4 +8,5 @@ public interface IVillagesRepository
     Task<Village?> GetVillageById(Guid id, CancellationToken cancellationToken);
     Task<Village?> GetVillageByUserId(Guid userId, CancellationToken cancellationToken);
     Task<Village?> GetVillageByIdWithResourcesOnly(Guid villageId, CancellationToken cancellationToken);
+    Task UpdateResourcesGlobally(CancellationToken cancellationToken);
 }
