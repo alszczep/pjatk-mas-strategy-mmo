@@ -23,7 +23,7 @@ public class VillagesService : IVillagesService
 
     public void CreateVillage(string villageName, User owner)
     {
-        Village village = Village.CreateVillage("New village", owner);
+        Village village = Village.CreateVillage(villageName, owner);
         this.villagesRepository.AddVillage(village);
     }
 

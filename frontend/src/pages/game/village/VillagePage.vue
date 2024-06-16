@@ -1,156 +1,77 @@
 <script setup lang="ts">
   import { ref } from "vue"
-  import {
-    ownerVillageEndpoint,
-    villageByIdEndpoint,
-  } from "../../../api/endpoints"
-  import type { BuildingSummaryDTO } from "../../../api/dtos"
+  import { villageByIdEndpoint } from "../../../api/endpoints"
   import BuildingsGrid from "../../../components/village/BuildingsGrid.vue"
   import OperationQueue from "../../../components/village/OperationQueue.vue"
   import { useRoute } from "vue-router"
   import { routes } from "../../../routes"
   import ResourcesRow from "../../../components/common/ResourcesRow.vue"
+  import WholePageLoader from "../../../components/common/WholePageLoader.vue"
   import TroopsList from "../../../components/village/TroopsList.vue"
+  import type { VillageDetailsDTO } from "../../../api/dtos/VillageDetailsDTO"
 
   const route = useRoute()
   const villageId = route.params[routes.game.village.param] as string
 
-  const villageName = ref<string>()
+  const village = ref<VillageDetailsDTO>()
 
-  async function fetchOwnersVillage() {
+  async function fetchVillage() {
     if (villageId === undefined) {
       return
     }
 
-    if (villageId === routes.game.village.paramDefault) {
-      villageName.value = (await ownerVillageEndpoint()).name
-      return
-    }
-
-    villageName.value = (await villageByIdEndpoint(villageId)).name
+    village.value = await villageByIdEndpoint(villageId)
   }
-  fetchOwnersVillage()
-
-  // TODO: get from backend
-  const buildings: BuildingSummaryDTO[] = [
-    {
-      place: 0,
-      imageUrl:
-        "https://opengameart.org/sites/default/files/styles/medium/public/blacksmith.svg_.png",
-      level: 1,
-    },
-    {
-      place: 1,
-    },
-    {
-      place: 2,
-      imageUrl:
-        "https://opengameart.org/sites/default/files/styles/medium/public/blacksmith.svg_.png",
-      level: 1,
-    },
-    {
-      place: 3,
-    },
-    {
-      place: 4,
-      imageUrl:
-        "https://opengameart.org/sites/default/files/styles/medium/public/blacksmith.svg_.png",
-      level: 1,
-    },
-    {
-      place: 5,
-      imageUrl:
-        "https://opengameart.org/sites/default/files/styles/medium/public/blacksmith.svg_.png",
-      level: 1,
-    },
-    {
-      place: 6,
-      imageUrl:
-        "https://opengameart.org/sites/default/files/styles/medium/public/blacksmith.svg_.png",
-      level: 1,
-    },
-    {
-      place: 7,
-      imageUrl:
-        "https://opengameart.org/sites/default/files/styles/medium/public/blacksmith.svg_.png",
-      level: 1,
-    },
-    {
-      place: 8,
-      imageUrl:
-        "https://opengameart.org/sites/default/files/styles/medium/public/blacksmith.svg_.png",
-      level: 20,
-    },
-    {
-      place: 9,
-      imageUrl:
-        "https://opengameart.org/sites/default/files/styles/medium/public/blacksmith.svg_.png",
-      level: 15,
-    },
-  ]
-
-  // TODO: get from backend
-  const buildingsQueue = [
-    {
-      name: "Koszary",
-      finishTimestamp: 1717258788000,
-      infoColumn: "4",
-    },
-    {
-      name: "Chata drwala",
-      finishTimestamp: 1717264108000,
-      infoColumn: "7",
-    },
-    {
-      name: "Kopalnia",
-      finishTimestamp: 1717343308000,
-      infoColumn: "1",
-    },
-  ]
-
-  // TODO: get from backend
-  const trainingQueue: any[] = []
-
-  // TODO: get from backend
-  const troops = [
-    {
-      name: "Swordsman",
-      imageUrl: "http://localhost:4200/armored_swordman.bmp",
-      count: 10,
-    },
-    {
-      name: "Archer",
-      imageUrl: "http://localhost:4200/archer.bmp",
-      count: 45,
-    },
-  ]
+  fetchVillage()
 </script>
 
 <template>
-  <div class="page-wrapper">
-    <!-- TODO: get from backend -->
-    <ResourcesRow
-      :values="{ wood: 100, iron: 200, wheat: 300, gold: 400 }"
-      class="resources"
-    />
+  <WholePageLoader v-if="!village" />
+  <div class="page-wrapper" v-else>
+    <ResourcesRow :values="village.availableResources" class="resources" />
     <div class="buildings-and-troops">
       <BuildingsGrid
-        :buildings="buildings"
+        :buildings="
+          village.buildings.map((building) => ({
+            place: building.buildingSpot,
+            imageUrl: building.imageUrl,
+            level: building.level,
+          }))
+        "
         :village-id="villageId"
         class="buildings"
       />
-
-      <TroopsList :troops="troops" />
+      <TroopsList
+        :troops="
+          village.militaryUnits.map((unit) => ({
+            name: unit.name,
+            imageUrl: unit.iconUrl as string, // TODO: placeholder
+            count: unit.amount,
+          }))
+        "
+      />
     </div>
     <OperationQueue
       title="Buildings queue"
       info-column-title="Upgrade to level"
-      :items="buildingsQueue"
+      :items="
+        village.buildingsQueue.map((building) => ({
+          name: building.buildingName,
+          finishTimestamp: new Date(building.endTime).getTime(),
+          infoColumn: building.toLevel.toString(),
+        }))
+      "
     />
     <OperationQueue
       title="Troops training queue"
       info-column-title="Number of troops"
-      :items="trainingQueue"
+      :items="
+        village.militaryUnitsQueue.map((unit) => ({
+          name: unit.militaryUnitName,
+          finishTimestamp: new Date(unit.endTime).getTime(),
+          infoColumn: unit.amount.toString(),
+        }))
+      "
       class="troops-training-queue"
     />
   </div>

@@ -26,7 +26,15 @@ public class Village
             Id = Guid.NewGuid(),
             Name = name,
             CreationDateTime = DateTime.UtcNow,
-            Owner = owner
+            Owner = owner,
+            AvailableResources = new Resources()
+            {
+                Id = Guid.NewGuid(),
+                Wood = 1000,
+                Iron = 1000,
+                Wheat = 1000,
+                Gold = 1000
+            }
         };
     }
 }

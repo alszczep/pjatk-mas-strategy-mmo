@@ -46,15 +46,15 @@ public class UserController : ControllerBase
     [HttpPost("register")]
     public async Task<ActionResult<TokenDTO>> Register([FromBody] UserAuthDTO dto, CancellationToken cancellationToken)
     {
-        if (this.usersService.IsUsernameValid(dto.Username))
+        if (!this.usersService.IsUsernameValid(dto.Username))
             return this.BadRequest(
                 "Username must but 120 characters or shorter");
-        if (this.usersService.IsPasswordValid(dto.Password))
+        if (!this.usersService.IsPasswordValid(dto.Password))
             return this.BadRequest(
                 "Password must but 120 characters or shorter");
 
         User user = this.usersService.CreateUser(dto.Username, dto.Password);
-        this.villagesService.CreateVillage("New village", user);
+        this.villagesService.CreateVillage(dto.Username + "'s Village", user);
 
         user.GenerateJwtToken(this.configuration["Auth:JwtSecret"]!);
 

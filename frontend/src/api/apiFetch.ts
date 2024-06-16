@@ -19,5 +19,10 @@ export const apiFetch = async (
     },
     ...options,
   })
+
+  if (response.status === 204) {
+    return undefined
+  }
+
   return await response.json()
 }

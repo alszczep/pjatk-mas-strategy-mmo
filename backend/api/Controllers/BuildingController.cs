@@ -23,13 +23,13 @@ public class BuildingController : ControllerBase
     }
 
     [HttpGet("buildableBuildings/{villageId}")]
-    public async Task<ActionResult<List<BuildableBuildingDTO>>> GetBuildableBuildings([FromQuery] Guid villageId,
+    public async Task<ActionResult<List<BuildableBuildingDTO>>> GetBuildableBuildings(Guid villageId,
         CancellationToken cancellationToken)
     {
         return await this.buildingsService.GetBuildableBuildings(villageId, cancellationToken);
     }
 
-    [HttpGet("buildingDetails")]
+    [HttpPost("buildingDetails")]
     public async Task<ActionResult<BuildingDetailsDTO?>> GetBuildingDetails(
         [FromBody] BuildingDetailsParametersDTO dto, CancellationToken cancellationToken)
     {

@@ -24,12 +24,15 @@
     }
   }
 
-  const buildingsWithPosition = buildings.map((building, index) => {
-    return {
-      ...building,
-      ...appendSizeToGridPosition(buildingPlaceToGridPosition[index]),
-    }
-  })
+  const buildingsWithPosition = buildingPlaceToGridPosition.map(
+    (position, index) => {
+      return {
+        ...buildings.find((building) => building.place === index),
+        ...appendSizeToGridPosition(position),
+        place: index,
+      }
+    },
+  )
 </script>
 
 <template>

@@ -12,6 +12,7 @@ import VillagePage from "./pages/game/village/VillagePage.vue"
 import BuildingPage from "./pages/game/village/building/BuildingPage.vue"
 
 import { isLoggedIn } from "./auth/isLoggedIn"
+import { villageIdByOwnerEndpoint } from "./api/endpoints"
 
 export const routes = {
   login: {
@@ -26,7 +27,6 @@ export const routes = {
       index: "/game/village",
       param: "villageId",
       withParam: (villageId: string) => `/game/village/${villageId}`,
-      paramDefault: "owner",
       building: {
         index: "/game/village/:villageId/building",
         param: "placeInVillage",
@@ -78,14 +78,13 @@ export const router = createRouter({
   routes: routesComponents,
 })
 
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
   const pathsWithoutAuth: string[] = [routes.login.index, routes.register.index]
-  const isPathWithoutAuth = (p: RouteLocationNormalized) =>
-    pathsWithoutAuth.includes(p.path)
 
-  if (isPathWithoutAuth(to)) {
+  if (pathsWithoutAuth.includes(to.path)) {
     if (isLoggedIn()) {
-      return routes.game.village.withParam(routes.game.village.paramDefault)
+      const villageId = await villageIdByOwnerEndpoint()
+      return routes.game.village.withParam(villageId)
     }
   } else {
     if (!isLoggedIn()) {

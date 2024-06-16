@@ -22,18 +22,16 @@ public class VillageController : ControllerBase
         this.authorizationService = authorizationService;
     }
 
-    [HttpGet("byVillageId/{id}")]
-    public async Task<ActionResult<VillageDetailsDTO?>> GetVillageByVillageId([FromQuery] Guid villageId,
+    [HttpGet("byVillageId/{villageId}")]
+    public async Task<ActionResult<VillageDetailsDTO?>> GetVillageByVillageId(Guid villageId,
         CancellationToken cancellationToken)
     {
-        VillageDetailsDTO? village = await this.villagesService.GetVillageById(villageId, cancellationToken);
+        VillageDetailsDTO? village =
+            await this.villagesService.GetVillageById(villageId, cancellationToken);
 
         if (village == null) return this.NotFound();
 
-        return new VillageDetailsDTO
-        {
-            Name = village.Name
-        };
+        return village;
     }
 
     [HttpGet("villageIdByOwner")]

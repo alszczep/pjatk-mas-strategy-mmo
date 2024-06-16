@@ -19,6 +19,8 @@ public class BuildingsRepository : IBuildingsRepository
         return this.coreDbContext.Buildings
             .Include(b => b.InVillages)
             .ThenInclude(b => b.Village)
+            .Include(b => b.Levels)
+            .ThenInclude(l => l.ResourcesCost)
             .Where(b => b.InVillages.Count(bv => bv.Village.Id == villageId) < b.MaxInVillage)
             .ToListAsync(cancellationToken);
     }

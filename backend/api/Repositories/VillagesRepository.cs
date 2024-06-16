@@ -35,9 +35,9 @@ public class VillagesRepository : IVillagesRepository
             .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public Task<Village?> GetVillageById(Guid id, CancellationToken cancellationToken)
+    public async Task<Village?> GetVillageById(Guid id, CancellationToken cancellationToken)
     {
-        return this.HandleVillageIncludes(this.coreDbContext.Villages
+        return await this.HandleVillageIncludes(this.coreDbContext.Villages
             .Where(v => v.Id == id), cancellationToken);
     }
 
