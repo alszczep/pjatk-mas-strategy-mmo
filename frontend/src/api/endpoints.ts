@@ -55,3 +55,19 @@ export const updateBuildingsQueueEndpoint = (
   villageId: string,
 ): Promise<void> =>
   apiFetch(`building/updateBuildingsQueue/${villageId}`, "POST")
+
+export const scheduleMilitaryUnitTrainingEndpoint = (
+  VillageId: string,
+  MilitaryUnitId: string,
+  Amount: number,
+): Promise<void> =>
+  apiFetch("militaryUnit/scheduleMilitaryUnitTraining", "POST", {
+    VillageId,
+    MilitaryUnitId,
+    Amount,
+  })
+
+export const updateMilitaryUnitsQueueEndpoint = (
+  VillageId: string,
+): Promise<void> =>
+  apiFetch(`militaryUnit/updateMilitaryUnitsQueue/${VillageId}`, "POST")

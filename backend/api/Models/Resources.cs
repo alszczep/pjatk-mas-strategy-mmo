@@ -31,13 +31,24 @@ public class Resources
         return a;
     }
 
-    public static bool operator >=(Resources a, Resources b)
+    public static Resources operator *(Resources a, int b)
     {
-        return a.Wood >= b.Wood && a.Iron >= b.Iron && a.Wheat >= b.Wheat && a.Gold >= b.Gold;
+        return new Resources()
+        {
+            Wood = a.Wood * b,
+            Iron = a.Iron * b,
+            Wheat = a.Wheat * b,
+            Gold = a.Gold * b
+        };
     }
 
-    public static bool operator <=(Resources a, Resources b)
+    public static bool operator >(Resources a, Resources b)
     {
-        return a.Wood <= b.Wood && a.Iron <= b.Iron && a.Wheat <= b.Wheat && a.Gold <= b.Gold;
+        return a.Wood > b.Wood || a.Iron > b.Iron || a.Wheat > b.Wheat || a.Gold > b.Gold;
+    }
+
+    public static bool operator <(Resources a, Resources b)
+    {
+        return a.Wood < b.Wood && a.Iron < b.Iron && a.Wheat < b.Wheat && a.Gold < b.Gold;
     }
 }

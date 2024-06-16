@@ -54,7 +54,7 @@ public class UserController : ControllerBase
                 "Password must but 120 characters or shorter");
 
         User user = this.usersService.CreateUser(dto.Username, dto.Password);
-        this.villagesService.CreateVillage(dto.Username + "'s Village", user);
+        await this.villagesService.CreateVillage(dto.Username + "'s Village", user, cancellationToken);
 
         user.GenerateJwtToken(this.configuration["Auth:JwtSecret"]!);
 

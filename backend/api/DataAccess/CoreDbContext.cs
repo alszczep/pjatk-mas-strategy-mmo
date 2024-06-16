@@ -231,8 +231,8 @@ public class CoreDbContext : DbContext
             entity.Property(e => e.EndTime).IsRequired();
             entity.Property(e => e.Amount).IsRequired();
 
-            entity.HasOne(e => e.MilitaryUnit).WithMany().IsRequired();
-            entity.HasOne(e => e.Village).WithMany().IsRequired();
+            entity.HasOne(e => e.MilitaryUnit).WithMany(e => e.MilitaryUnitsQueues).IsRequired();
+            entity.HasOne(e => e.Village).WithMany(e => e.MilitaryUnitsQueue).IsRequired();
         });
 
         modelBuilder.Entity<MilitaryUnitsInVillage>(entity =>
@@ -243,8 +243,8 @@ public class CoreDbContext : DbContext
 
             entity.Property(e => e.Amount).IsRequired();
 
-            entity.HasOne(e => e.MilitaryUnit).WithMany().IsRequired();
-            entity.HasOne(e => e.Village).WithMany().IsRequired();
+            entity.HasOne(e => e.MilitaryUnit).WithMany(e => e.MilitaryUnitsInVillages).IsRequired();
+            entity.HasOne(e => e.Village).WithMany(e => e.MilitaryUnits).IsRequired();
         });
 
         modelBuilder.Entity<Location>(entity =>

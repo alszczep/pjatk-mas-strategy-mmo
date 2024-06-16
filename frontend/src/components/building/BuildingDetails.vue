@@ -2,7 +2,12 @@
   import { useToast } from "vue-toast-notification"
   import type { BuildingDetailsDTO } from "../../api/dtos/BuildingDetailsDTO"
   import ResourcesRow from "../common/ResourcesRow.vue"
-  import { scheduleUpgradeEndpoint } from "../../api/endpoints"
+  import {
+    scheduleMilitaryUnitTrainingEndpoint,
+    scheduleUpgradeEndpoint,
+  } from "../../api/endpoints"
+  import TrainableTroopRow from "./TrainableTroopRow.vue"
+  import { router, routes } from "../../routes"
 
   const { building, placeInVillage, villageId } = defineProps<{
     building: BuildingDetailsDTO
@@ -15,11 +20,8 @@
   const upgrade = () => {
     scheduleUpgradeEndpoint(villageId, placeInVillage).then(() => {
       $toast.success("Building upgrade scheduled")
+      router.push(routes.game.village.withParam(villageId))
     })
-  }
-
-  const train = () => {
-    alert("TODO")
   }
 </script>
 
@@ -65,30 +67,13 @@
       </div>
       <div v-if="building.trainableUnits" class="troops">
         <h3>Trainable troops</h3>
-        <div
+        <TrainableTroopRow
           v-for="troop in building.trainableUnits"
           :key="troop.id"
+          :troop="troop"
+          :village-id="villageId"
           class="troop"
-        >
-          <img :src="troop.iconUrl" class="troop-image" />
-          <div class="resources-inner">
-            <div>{{ troop.name }}</div>
-            <ResourcesRow
-              variant="tonal"
-              class="resources"
-              :values="troop.trainingCost"
-            />
-          </div>
-          <v-text-field
-            class="input"
-            hide-details="auto"
-            label="Count"
-            type="number"
-            density="compact"
-            min="1"
-          ></v-text-field>
-          <v-btn variant="tonal" @click="train">Train</v-btn>
-        </div>
+        />
       </div>
     </v-card-text>
   </v-card>

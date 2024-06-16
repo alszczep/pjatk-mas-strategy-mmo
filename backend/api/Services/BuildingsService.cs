@@ -47,8 +47,12 @@ public class BuildingsService : IBuildingsService
 
         BuildingLevel level = building.Levels.First(l => l.Level == 1);
 
-        if (!(village.AvailableResources >= level.ResourcesCost))
+        if (level.ResourcesCost > village.AvailableResources)
             throw new InvalidOperationException("Not enough resources");
+
+        List<BuildingsQueue> currentQueue =
+            await this.buildingsQueueRepository.GetBuildingsQueueForVillage(villageId, cancellationToken);
+        BuildingsQueue? lastInQueue = currentQueue.MaxBy(q => q.EndTime);
 
         BuildingInVillage newBuildingInVillage = new()
         {
@@ -63,8 +67,8 @@ public class BuildingsService : IBuildingsService
         {
             Id = Guid.NewGuid(),
             BuildingInVillage = newBuildingInVillage,
-            StartTime = DateTime.UtcNow,
-            EndTime = DateTime.UtcNow + TimeSpan.FromSeconds(level.BuildingTimeInSeconds),
+            StartTime = lastInQueue?.EndTime ?? DateTime.UtcNow,
+            EndTime = (lastInQueue?.EndTime ?? DateTime.UtcNow) + TimeSpan.FromSeconds(level.BuildingTimeInSeconds),
             LevelAfterUpgrade = 1
         };
 
@@ -83,8 +87,10 @@ public class BuildingsService : IBuildingsService
 
         if (buildingInVillage == null) throw new InvalidOperationException("Building not found");
 
-        BuildingsQueue? lastInQueue = buildingInVillage.BuildingQueue.MaxBy(q => q.EndTime);
-        int levelToBeBuilt = lastInQueue is null ? buildingInVillage.Level + 1 : lastInQueue.LevelAfterUpgrade + 1;
+        BuildingsQueue? lastSameBuildingInQueue = buildingInVillage.BuildingQueue.MaxBy(q => q.EndTime);
+        int levelToBeBuilt = lastSameBuildingInQueue is null
+            ? buildingInVillage.Level + 1
+            : lastSameBuildingInQueue.LevelAfterUpgrade + 1;
 
         BuildingLevel? buildingLevelToBeBuilt =
             buildingInVillage.Building.Levels.FirstOrDefault(l => l.Level == levelToBeBuilt);
@@ -96,8 +102,12 @@ public class BuildingsService : IBuildingsService
 
         if (village == null) throw new InvalidOperationException("Village not found");
 
-        if (!(village.AvailableResources >= buildingLevelToBeBuilt.ResourcesCost))
+        if (buildingLevelToBeBuilt.ResourcesCost > village.AvailableResources)
             throw new InvalidOperationException("Not enough resources");
+
+        List<BuildingsQueue> currentQueue =
+            await this.buildingsQueueRepository.GetBuildingsQueueForVillage(villageId, cancellationToken);
+        BuildingsQueue? lastInQueue = currentQueue.MaxBy(q => q.EndTime);
 
         BuildingsQueue buildingQueue = new()
         {

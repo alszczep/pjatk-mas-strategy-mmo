@@ -54,11 +54,16 @@ builder.Services.AddScoped<IBuildingsInVillageRepository, BuildingsInVillageRepo
 builder.Services.AddScoped<IBuildingsQueueRepository, BuildingsQueueRepository>();
 builder.Services.AddScoped<IBuildingsRepository, BuildingsRepository>();
 builder.Services.AddScoped<IDbTransactionRepository, DbTransactionRepository>();
+builder.Services.AddScoped<ILocationsRepository, LocationsRepository>();
+builder.Services.AddScoped<IMilitaryUnitsInVillageRepository, MilitaryUnitsInVillageRepository>();
+builder.Services.AddScoped<IMilitaryUnitsQueueRepository, MilitaryUnitsQueueRepository>();
+builder.Services.AddScoped<IMilitaryUnitsRepository, MilitaryUnitsRepository>();
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 builder.Services.AddScoped<IVillagesRepository, VillagesRepository>();
 
 builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
 builder.Services.AddScoped<IBuildingsService, BuildingsService>();
+builder.Services.AddScoped<IMilitaryUnitsService, MilitaryUnitsService>();
 builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<IVillagesService, VillagesService>();
 

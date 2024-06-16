@@ -19,7 +19,7 @@ public class Village
     public int PositionY { get; init; }
     public Location Location { get; private set; } = null!;
 
-    public static Village CreateVillage(string name, User owner)
+    public static Village CreateVillage(string name, User owner, Location location)
     {
         return new Village()
         {
@@ -34,7 +34,10 @@ public class Village
                 Iron = 1000,
                 Wheat = 1000,
                 Gold = 1000
-            }
+            },
+            Location = location,
+            PositionX = location.PositionX,
+            PositionY = location.PositionY
         };
     }
 }

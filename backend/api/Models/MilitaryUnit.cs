@@ -14,6 +14,11 @@ public class MilitaryUnit
     public Guid TrainingCostId { get; init; }
     public Resources TrainingCost { get; init; } = null!;
 
+    public ICollection<MilitaryUnitsInVillage> MilitaryUnitsInVillages { get; private set; } =
+        new List<MilitaryUnitsInVillage>();
+
+    public ICollection<MilitaryUnitsQueue> MilitaryUnitsQueues { get; private set; } = new List<MilitaryUnitsQueue>();
+
     private int GetStrength()
     {
         return this.Attack + this.Defense;

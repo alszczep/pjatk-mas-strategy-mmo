@@ -1,6 +1,10 @@
 <script setup lang="ts">
   import { ref } from "vue"
-  import { villageByIdEndpoint } from "../../../api/endpoints"
+  import {
+    updateBuildingsQueueEndpoint,
+    updateMilitaryUnitsQueueEndpoint,
+    villageByIdEndpoint,
+  } from "../../../api/endpoints"
   import BuildingsGrid from "../../../components/village/BuildingsGrid.vue"
   import OperationQueue from "../../../components/village/OperationQueue.vue"
   import { useRoute } from "vue-router"
@@ -23,6 +27,24 @@
     village.value = await villageByIdEndpoint(villageId)
   }
   fetchVillage()
+
+  const updateBuildingsQueue = async () => {
+    if (villageId === undefined) {
+      return
+    }
+
+    await updateBuildingsQueueEndpoint(villageId)
+    fetchVillage()
+  }
+
+  const updateMilitaryUnitsQueue = async () => {
+    if (villageId === undefined) {
+      return
+    }
+
+    await updateMilitaryUnitsQueueEndpoint(villageId)
+    fetchVillage()
+  }
 </script>
 
 <template>
@@ -61,6 +83,7 @@
           infoColumn: building.toLevel.toString(),
         }))
       "
+      :on-finish="updateBuildingsQueue"
     />
     <OperationQueue
       title="Troops training queue"
@@ -73,6 +96,7 @@
         }))
       "
       class="troops-training-queue"
+      :on-finish="updateMilitaryUnitsQueue"
     />
   </div>
 </template>

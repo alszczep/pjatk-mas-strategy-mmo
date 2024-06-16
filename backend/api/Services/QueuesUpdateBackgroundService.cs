@@ -25,8 +25,12 @@ public class QueuesUpdateBackgroundService : BackgroundService
             {
                 IBuildingsService buildingsService = scope.ServiceProvider.GetRequiredService<IBuildingsService>();
                 IVillagesService villagesService = scope.ServiceProvider.GetRequiredService<IVillagesService>();
+                IMilitaryUnitsService militaryUnitsService =
+                    scope.ServiceProvider.GetRequiredService<IMilitaryUnitsService>();
+
                 await buildingsService.UpdateBuildingsQueueGlobally(cancellationToken);
                 await villagesService.UpdateResourcesGlobally(cancellationToken);
+                await militaryUnitsService.UpdateMilitaryUnitsQueueGlobally(cancellationToken);
             }
 
             await Task.Delay(TimeSpan.FromMinutes(1), cancellationToken);

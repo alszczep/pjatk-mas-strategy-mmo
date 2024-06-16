@@ -15,6 +15,7 @@
 
   const build = async (buildingId: string) => {
     scheduleBuildingEndpoint(villageId, placeInVillage, buildingId).then(() => {
+      $toast.success("Building construction scheduled")
       router.push(routes.game.village.withParam(villageId))
     })
   }

@@ -7,11 +7,14 @@ namespace api.Services;
 
 public class VillagesService : IVillagesService
 {
+    private readonly ILocationsRepository locationsRepository;
     private readonly IVillagesRepository villagesRepository;
     private readonly IDbTransactionRepository dbTransactionRepository;
 
-    public VillagesService(IVillagesRepository villagesRepository, IDbTransactionRepository dbTransactionRepository)
+    public VillagesService(ILocationsRepository locationsRepository, IVillagesRepository villagesRepository,
+        IDbTransactionRepository dbTransactionRepository)
     {
+        this.locationsRepository = locationsRepository;
         this.villagesRepository = villagesRepository;
         this.dbTransactionRepository = dbTransactionRepository;
     }
@@ -21,9 +24,16 @@ public class VillagesService : IVillagesService
         return this.dbTransactionRepository.SaveChangesAsync(cancellationToken);
     }
 
-    public void CreateVillage(string villageName, User owner)
+    public async Task CreateVillage(string villageName, User owner, CancellationToken cancellationToken)
     {
-        Village village = Village.CreateVillage(villageName, owner);
+        var unoccupiedLocations = await this.locationsRepository.GetUnoccupiedLocations(cancellationToken);
+        if (unoccupiedLocations.Count == 0) throw new Exception("No unoccupied locations available");
+
+        Random random = new();
+        int index = random.Next(unoccupiedLocations.Count);
+        Location location = unoccupiedLocations[index];
+
+        Village village = Village.CreateVillage(villageName, owner, location);
         this.villagesRepository.AddVillage(village);
     }
 

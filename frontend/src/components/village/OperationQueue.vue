@@ -8,10 +8,11 @@
     infoColumn: string
   }
 
-  const { title, infoColumnTitle, items } = defineProps<{
+  const { title, infoColumnTitle, items, onFinish } = defineProps<{
     title: string
     infoColumnTitle: string
     items: Item[]
+    onFinish: () => Promise<void>
   }>()
 
   const currentTimestamp = ref(new Date().getTime())
@@ -20,6 +21,20 @@
       currentTimestamp.value = new Date().getTime()
     },
   })
+
+  let refreshTimestamps: number[] = []
+
+  const handleRefresh = async (finishTimestamp: number) => {
+    if (refreshTimestamps.includes(finishTimestamp)) {
+      return
+    }
+
+    refreshTimestamps.push(finishTimestamp)
+    await onFinish()
+    refreshTimestamps = refreshTimestamps.filter(
+      (timestamp) => timestamp !== finishTimestamp,
+    )
+  }
 
   const headers = [
     {
@@ -38,6 +53,7 @@
       value: (item: Item) => {
         const diff = item.finishTimestamp - currentTimestamp.value
         if (diff < 0) {
+          handleRefresh(item.finishTimestamp)
           return "-"
         }
 
