@@ -1,10 +1,8 @@
 <script setup lang="ts">
   import { useRoute } from "vue-router"
   import { routes } from "../../../../routes"
-  import type {
-    BuildableBuildingDTO,
-    BuildingDetailsDTO,
-  } from "../../../../api/dtos"
+  import type { BuildingDetailsDTO } from "../../../../api/dtos/BuildingDetailsDTO"
+  import type { BuildableBuildingDTO } from "../../../../api/dtos/BuildableBuildingDTO"
   import ResourcesRow from "../../../../components/common/ResourcesRow.vue"
   import WholePageLoader from "../../../../components/common/WholePageLoader.vue"
   import BuildableBuildingsList from "../../../../components/building/BuildableBuildingsList.vue"
@@ -62,11 +60,13 @@
     <BuildableBuildingsList
       v-if="!buildingDetails && buildableBuildings"
       :buildings="buildableBuildings"
+      :place-in-village="Number(placeInVillage)"
       :village-id="villageId"
     />
     <BuildingDetails
       v-if="buildingDetails"
       :village-id="villageId"
+      :place-in-village="Number(placeInVillage)"
       :building="buildingDetails"
     />
   </div>

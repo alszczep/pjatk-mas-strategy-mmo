@@ -24,5 +24,9 @@ export const apiFetch = async (
     return undefined
   }
 
-  return await response.json()
+  try {
+    return await response.json()
+  } catch (error) {
+    return Promise.resolve()
+  }
 }

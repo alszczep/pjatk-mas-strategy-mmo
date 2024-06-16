@@ -1,5 +1,7 @@
 import { apiFetch } from "./apiFetch"
-import type { BuildableBuildingDTO, BuildingDetailsDTO, TokenDTO } from "./dtos"
+import type { TokenDTO } from "./dtos"
+import type { BuildableBuildingDTO } from "./dtos/BuildableBuildingDTO"
+import type { BuildingDetailsDTO } from "./dtos/BuildingDetailsDTO"
 import type { VillageDetailsDTO } from "./dtos/VillageDetailsDTO"
 
 export const loginEndpoint = (
@@ -31,3 +33,25 @@ export const getBuildingDetailsEndpoint = (
   BuildingSpot: number,
 ): Promise<BuildingDetailsDTO | undefined> =>
   apiFetch("building/buildingDetails", "POST", { VillageId, BuildingSpot })
+
+export const scheduleBuildingEndpoint = (
+  VillageId: string,
+  BuildingSpot: number,
+  BuildingId: string,
+): Promise<void> =>
+  apiFetch("building/scheduleBuilding", "POST", {
+    VillageId,
+    BuildingSpot,
+    BuildingId,
+  })
+
+export const scheduleUpgradeEndpoint = (
+  VillageId: string,
+  BuildingSpot: number,
+): Promise<void> =>
+  apiFetch("building/scheduleUpgrade", "POST", { VillageId, BuildingSpot })
+
+export const updateBuildingsQueueEndpoint = (
+  villageId: string,
+): Promise<void> =>
+  apiFetch(`building/updateBuildingsQueue/${villageId}`, "POST")

@@ -81,8 +81,6 @@ public class CoreDbContext : DbContext
             entity.Property(e => e.AvailableResourcesId).IsRequired();
 
             entity.HasIndex(e => new { e.PositionX, e.PositionY }).IsUnique();
-
-            // entity.HasOne(e => e.AvailableResources).WithOne().HasForeignKey<Resources>(e => e.Id).IsRequired();
         });
 
         modelBuilder.Entity<Building>(entity =>
@@ -220,7 +218,8 @@ public class CoreDbContext : DbContext
             entity.Property(e => e.EndTime).IsRequired();
             entity.Property(e => e.LevelAfterUpgrade).IsRequired();
 
-            entity.HasOne(e => e.BuildingInVillage).WithMany().IsRequired();
+            entity.HasOne(e => e.BuildingInVillage).WithMany(e => e.BuildingQueue)
+                .IsRequired();
         });
 
         modelBuilder.Entity<MilitaryUnitsQueue>(entity =>

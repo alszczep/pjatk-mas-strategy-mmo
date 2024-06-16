@@ -48,7 +48,8 @@ public class VillagesService : IVillagesService
                 Id = building.Id,
                 Name = building.Building.Name,
                 Level = building.Level,
-                ImageUrl = building.Building.ImageUrl
+                ImageUrl = building.Building.ImageUrl,
+                BuildingSpot = building.BuildingSpot
             }).ToList(),
             AvailableResources = new ResourcesDTO
             {

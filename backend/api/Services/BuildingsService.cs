@@ -68,9 +68,9 @@ public class BuildingsService : IBuildingsService
             LevelAfterUpgrade = 1
         };
 
+        village.AvailableResources -= level.ResourcesCost;
         this.buildingsInVillageRepository.AddBuildingInVillage(newBuildingInVillage);
         this.buildingsQueueRepository.AddBuildingsQueueItem(buildingQueue);
-        village.AvailableResources -= level.ResourcesCost;
 
         await this.dbTransactionRepository.SaveChangesAsync(cancellationToken);
     }
@@ -104,8 +104,8 @@ public class BuildingsService : IBuildingsService
             Id = Guid.NewGuid(),
             BuildingInVillage = buildingInVillage,
             StartTime = lastInQueue?.EndTime ?? DateTime.UtcNow,
-            EndTime = lastInQueue?.EndTime ??
-                      DateTime.UtcNow + TimeSpan.FromSeconds(buildingLevelToBeBuilt.BuildingTimeInSeconds),
+            EndTime = (lastInQueue?.EndTime ??
+                       DateTime.UtcNow) + TimeSpan.FromSeconds(buildingLevelToBeBuilt.BuildingTimeInSeconds),
             LevelAfterUpgrade = levelToBeBuilt
         };
 
@@ -147,35 +147,44 @@ public class BuildingsService : IBuildingsService
     public async Task<BuildingDetailsDTO?> GetBuildingByBuildingSpot(Guid villageId, int buildingSpot,
         CancellationToken cancellationToken)
     {
-        BuildingInVillage? building =
+        BuildingInVillage? buildingInVillage =
             await this.buildingsInVillageRepository.GetBuildingInVillageByBuildingSpot(villageId, buildingSpot,
                 cancellationToken);
 
-        if (building == null) return null;
+        if (buildingInVillage == null) return null;
 
-        BuildingLevel? level = building.Building.Levels.FirstOrDefault(l => l.Level == building.Level);
+        BuildingLevel? level = buildingInVillage.Level == 0
+            ? new BuildingLevel()
+            {
+                Level = 0,
+                BuildingTimeInSeconds = 0,
+                ResourcesCost = new Resources(),
+                ResourcesProductionPerMinute = null,
+                TrainingTimeShortenedPercentage = 0
+            }
+            : buildingInVillage.Building.Levels.FirstOrDefault(l => l.Level == buildingInVillage.Level);
 
         if (level == null) throw new InvalidOperationException("Building level not found");
 
-        Resources? production = building.Building.Type == BuildingType.Resources
+        Resources? production = buildingInVillage.Building.Type == BuildingType.Resources
             ? level.ResourcesProductionPerMinute
             : null;
 
-        var trainableUnits = building.Building.Type == BuildingType.Barracks
-            ? ((BuildingBarracks)building.Building).TrainableUnits.ToList()
+        var trainableUnits = buildingInVillage.Building.Type == BuildingType.Barracks
+            ? ((BuildingBarracks)buildingInVillage.Building).TrainableUnits.ToList()
             : null;
 
-        int highestLevelWithQueue = building.BuildingQueue.Select(queueRecord => queueRecord.LevelAfterUpgrade)
+        int highestLevelWithQueue = buildingInVillage.BuildingQueue.Select(queueRecord => queueRecord.LevelAfterUpgrade)
             .Prepend(level.Level).Max();
         BuildingLevel? upgradeLevel =
-            building.Building.Levels.FirstOrDefault(l => l.Level == highestLevelWithQueue + 1);
+            buildingInVillage.Building.Levels.FirstOrDefault(l => l.Level == highestLevelWithQueue + 1);
 
         return new BuildingDetailsDTO
         {
-            Id = building.Id,
-            Name = building.Building.Name,
-            ImageUrl = building.Building.ImageUrl,
-            CurrentLevel = building.Level,
+            Id = buildingInVillage.Id,
+            Name = buildingInVillage.Building.Name,
+            ImageUrl = buildingInVillage.Building.ImageUrl,
+            CurrentLevel = buildingInVillage.Level,
             ResourcesProductionPerMinute = production is null
                 ? null
                 : ResourcesDTO.ResourcesToDTO(production),

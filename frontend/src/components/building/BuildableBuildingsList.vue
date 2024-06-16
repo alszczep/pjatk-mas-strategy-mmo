@@ -1,17 +1,22 @@
 <script setup lang="ts">
   import { useToast } from "vue-toast-notification"
-  import type { BuildableBuildingDTO, BuildingDetailsDTO } from "../../api/dtos"
+  import type { BuildableBuildingDTO } from "../../api/dtos/BuildableBuildingDTO"
   import ResourcesRow from "../common/ResourcesRow.vue"
+  import { scheduleBuildingEndpoint } from "../../api/endpoints"
+  import { router, routes } from "../../routes"
 
-  const { buildings, villageId } = defineProps<{
+  const { buildings, placeInVillage, villageId } = defineProps<{
     buildings: BuildableBuildingDTO[]
+    placeInVillage: number
     villageId: string
   }>()
 
   const $toast = useToast()
 
-  const build = () => {
-    $toast.error("TODO")
+  const build = async (buildingId: string) => {
+    scheduleBuildingEndpoint(villageId, placeInVillage, buildingId).then(() => {
+      router.push(routes.game.village.withParam(villageId))
+    })
   }
 </script>
 
@@ -29,7 +34,9 @@
             :values="building.cost"
           />
         </div>
-        <v-btn variant="tonal" class="button" @click="build">Build</v-btn>
+        <v-btn variant="tonal" class="button" @click="() => build(building.id)"
+          >Build</v-btn
+        >
       </div>
     </v-card-text>
   </v-card>

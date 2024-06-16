@@ -1,5 +1,6 @@
 using api.DataAccess;
 using api.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace api.Repositories;
 

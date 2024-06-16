@@ -26,7 +26,8 @@ builder.Services.AddCors(
     });
 builder.Services.AddControllers();
 builder.Services.AddDbContext<CoreDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+);
 
 builder.Services.AddAuthentication(options =>
 {

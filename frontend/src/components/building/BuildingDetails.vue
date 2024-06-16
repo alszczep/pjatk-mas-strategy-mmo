@@ -1,14 +1,21 @@
 <script setup lang="ts">
-  import type { BuildingDetailsDTO } from "../../api/dtos"
+  import { useToast } from "vue-toast-notification"
+  import type { BuildingDetailsDTO } from "../../api/dtos/BuildingDetailsDTO"
   import ResourcesRow from "../common/ResourcesRow.vue"
+  import { scheduleUpgradeEndpoint } from "../../api/endpoints"
 
-  const { building, villageId } = defineProps<{
+  const { building, placeInVillage, villageId } = defineProps<{
     building: BuildingDetailsDTO
+    placeInVillage: number
     villageId: string
   }>()
 
+  const $toast = useToast()
+
   const upgrade = () => {
-    alert("TODO")
+    scheduleUpgradeEndpoint(villageId, placeInVillage).then(() => {
+      $toast.success("Building upgrade scheduled")
+    })
   }
 
   const train = () => {
@@ -19,29 +26,35 @@
 <template>
   <v-card class="wrapper">
     <v-card-title
-      >{{ building.name }} - level {{ building.level }}</v-card-title
+      >{{ building.name }} - level {{ building.currentLevel }}</v-card-title
     >
     <v-card-text class="text">
       <div class="top">
         <img :src="building.imageUrl" class="building-image" />
         <div class="top-desc">
-          <div v-if="building.production" class="resources-wrapper">
+          <div
+            v-if="building.resourcesProductionPerMinute"
+            class="resources-wrapper"
+          >
             <div class="resources-inner">
               <div>Current production per minute</div>
               <ResourcesRow
                 variant="tonal"
                 class="resources"
-                :values="building.production"
+                :values="building.resourcesProductionPerMinute"
               />
             </div>
           </div>
-          <div class="resources-wrapper">
+          <div class="resources-wrapper" v-if="building.upgrade">
             <div class="resources-inner">
-              <div>Cost of upgrade to {{ building.level + 1 }} level</div>
+              <div>
+                Cost of upgrade to
+                {{ building.upgrade.upgradeableToLevel }} level
+              </div>
               <ResourcesRow
                 variant="tonal"
                 class="resources"
-                :values="building.upgradeCost"
+                :values="building.upgrade.upgradeCost"
               />
             </div>
             <v-btn variant="tonal" class="upgrade-button" @click="upgrade">
@@ -50,20 +63,20 @@
           </div>
         </div>
       </div>
-      <div v-if="building.trainableTroops" class="troops">
+      <div v-if="building.trainableUnits" class="troops">
         <h3>Trainable troops</h3>
         <div
-          v-for="troop in building.trainableTroops"
+          v-for="troop in building.trainableUnits"
           :key="troop.id"
           class="troop"
         >
-          <img :src="troop.imageUrl" class="troop-image" />
+          <img :src="troop.iconUrl" class="troop-image" />
           <div class="resources-inner">
             <div>{{ troop.name }}</div>
             <ResourcesRow
               variant="tonal"
               class="resources"
-              :values="troop.unitCost"
+              :values="troop.trainingCost"
             />
           </div>
           <v-text-field

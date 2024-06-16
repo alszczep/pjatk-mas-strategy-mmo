@@ -3,33 +3,27 @@ namespace api.Models;
 public class Resources
 {
     public Guid Id { get; init; }
-    public int Wood { get; init; }
-    public int Iron { get; init; }
-    public int Wheat { get; init; }
-    public int Gold { get; init; }
+    public int Wood { get; set; }
+    public int Iron { get; set; }
+    public int Wheat { get; set; }
+    public int Gold { get; set; }
 
     public static Resources operator +(Resources a, Resources b)
     {
-        return new Resources
-        {
-            Id = a.Id,
-            Wood = a.Wood + b.Wood,
-            Iron = a.Iron + b.Iron,
-            Wheat = a.Wheat + b.Wheat,
-            Gold = a.Gold + b.Gold
-        };
+        a.Wood += b.Wood;
+        a.Iron += b.Iron;
+        a.Wheat += b.Wheat;
+        a.Gold += b.Gold;
+        return a;
     }
 
     public static Resources operator -(Resources a, Resources b)
     {
-        return new Resources
-        {
-            Id = a.Id,
-            Wood = a.Wood - b.Wood,
-            Iron = a.Iron - b.Iron,
-            Wheat = a.Wheat - b.Wheat,
-            Gold = a.Gold - b.Gold
-        };
+        a.Wood -= b.Wood;
+        a.Iron -= b.Iron;
+        a.Wheat -= b.Wheat;
+        a.Gold -= b.Gold;
+        return a;
     }
 
     public static bool operator >=(Resources a, Resources b)

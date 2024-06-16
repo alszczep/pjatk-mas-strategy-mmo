@@ -57,7 +57,7 @@
       :items="
         village.buildingsQueue.map((building) => ({
           name: building.buildingName,
-          finishTimestamp: new Date(building.endTime).getTime(),
+          finishTimestamp: new Date(`${building.endTime}Z`).getTime(),
           infoColumn: building.toLevel.toString(),
         }))
       "
@@ -68,7 +68,7 @@
       :items="
         village.militaryUnitsQueue.map((unit) => ({
           name: unit.militaryUnitName,
-          finishTimestamp: new Date(unit.endTime).getTime(),
+          finishTimestamp: new Date(`${unit.endTime}Z`).getTime(),
           infoColumn: unit.amount.toString(),
         }))
       "

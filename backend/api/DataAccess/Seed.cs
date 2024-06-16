@@ -73,6 +73,19 @@ public class Seed
     private static readonly Guid KnightTrainingCostId = Guid.Parse("00000000-0000-0000-0000-000000000024");
     private static readonly Guid KnightOnHorsebackTrainingCostId = Guid.Parse("00000000-0000-0000-0000-000000000025");
 
+    private static readonly Guid GoldMineL1Id = Guid.Parse("00000000-0000-0000-0000-000000000001");
+    private static readonly Guid GoldMineL2Id = Guid.Parse("00000000-0000-0000-0000-000000000002");
+    private static readonly Guid IronMineL1Id = Guid.Parse("00000000-0000-0000-0000-000000000003");
+    private static readonly Guid IronMineL2Id = Guid.Parse("00000000-0000-0000-0000-000000000004");
+    private static readonly Guid FarmL1Id = Guid.Parse("00000000-0000-0000-0000-000000000005");
+    private static readonly Guid FarmL2Id = Guid.Parse("00000000-0000-0000-0000-000000000006");
+    private static readonly Guid WoodcuttersHutL1Id = Guid.Parse("00000000-0000-0000-0000-000000000007");
+    private static readonly Guid WoodcuttersHutL2Id = Guid.Parse("00000000-0000-0000-0000-000000000008");
+    private static readonly Guid BarracksL1Id = Guid.Parse("00000000-0000-0000-0000-000000000009");
+    private static readonly Guid BarracksL2Id = Guid.Parse("00000000-0000-0000-0000-000000000010");
+    private static readonly Guid UniversityOfMilitaryTacticsL1Id = Guid.Parse("00000000-0000-0000-0000-000000000011");
+    private static readonly Guid UniversityOfMilitaryTacticsL2Id = Guid.Parse("00000000-0000-0000-0000-000000000012");
+    private static readonly Guid UniversityOfMilitaryTacticsL3Id = Guid.Parse("00000000-0000-0000-0000-000000000013");
 
     public static BuildingResources[] GetBuildingsResourcesSeed(Uri webAppUrl)
     {
@@ -125,7 +138,7 @@ public class Seed
             new()
             {
                 BuildingId = GoldMineId,
-                Id = Guid.NewGuid(), Level = 1, BuildingTimeInSeconds = 60,
+                Id = GoldMineL1Id, Level = 1, BuildingTimeInSeconds = 60,
                 TrainingTimeShortenedPercentage = 0,
                 ResourcesCostId = GoldMineL1ResourcesCostId,
                 ResourcesProductionPerMinuteId = GoldMineL1ResourcesProductionPerMinuteId
@@ -133,7 +146,7 @@ public class Seed
             new()
             {
                 BuildingId = GoldMineId,
-                Id = Guid.NewGuid(), Level = 2, BuildingTimeInSeconds = 150,
+                Id = GoldMineL2Id, Level = 2, BuildingTimeInSeconds = 150,
                 TrainingTimeShortenedPercentage = 10,
                 ResourcesCostId = GoldMineL2ResourcesCostId,
                 ResourcesProductionPerMinuteId = GoldMineL2ResourcesProductionPerMinuteId
@@ -141,7 +154,7 @@ public class Seed
             new()
             {
                 BuildingId = IronMineId,
-                Id = Guid.NewGuid(), Level = 1, BuildingTimeInSeconds = 60,
+                Id = IronMineL1Id, Level = 1, BuildingTimeInSeconds = 60,
                 TrainingTimeShortenedPercentage = 0,
                 ResourcesCostId = IronMineL1ResourcesCostId,
                 ResourcesProductionPerMinuteId = IronMineL1ResourcesProductionPerMinuteId
@@ -149,7 +162,7 @@ public class Seed
             new()
             {
                 BuildingId = IronMineId,
-                Id = Guid.NewGuid(), Level = 2, BuildingTimeInSeconds = 150,
+                Id = IronMineL2Id, Level = 2, BuildingTimeInSeconds = 150,
                 TrainingTimeShortenedPercentage = 10,
                 ResourcesCostId = IronMineL2ResourcesCostId,
                 ResourcesProductionPerMinuteId = IronMineL2ResourcesProductionPerMinuteId
@@ -157,7 +170,7 @@ public class Seed
             new()
             {
                 BuildingId = FarmId,
-                Id = Guid.NewGuid(), Level = 1, BuildingTimeInSeconds = 60,
+                Id = FarmL1Id, Level = 1, BuildingTimeInSeconds = 60,
                 TrainingTimeShortenedPercentage = 0,
                 ResourcesCostId = FarmL1ResourcesCostId,
                 ResourcesProductionPerMinuteId = FarmL1ResourcesProductionPerMinuteId
@@ -165,7 +178,7 @@ public class Seed
             new()
             {
                 BuildingId = FarmId,
-                Id = Guid.NewGuid(), Level = 2, BuildingTimeInSeconds = 150,
+                Id = FarmL2Id, Level = 2, BuildingTimeInSeconds = 150,
                 TrainingTimeShortenedPercentage = 10,
                 ResourcesCostId = FarmL2ResourcesCostId,
                 ResourcesProductionPerMinuteId = FarmL2ResourcesProductionPerMinuteId
@@ -173,7 +186,7 @@ public class Seed
             new()
             {
                 BuildingId = WoodcuttersHutId,
-                Id = Guid.NewGuid(), Level = 1, BuildingTimeInSeconds = 60,
+                Id = WoodcuttersHutL1Id, Level = 1, BuildingTimeInSeconds = 60,
                 TrainingTimeShortenedPercentage = 0,
                 ResourcesCostId = WoodcuttersHutL1ResourcesCostId,
                 ResourcesProductionPerMinuteId = WoodcuttersHutL1ResourcesProductionPerMinuteId
@@ -181,7 +194,7 @@ public class Seed
             new()
             {
                 BuildingId = WoodcuttersHutId,
-                Id = Guid.NewGuid(), Level = 2, BuildingTimeInSeconds = 150,
+                Id = WoodcuttersHutL2Id, Level = 2, BuildingTimeInSeconds = 150,
                 TrainingTimeShortenedPercentage = 10,
                 ResourcesCostId = WoodcuttersHutL2ResourcesCostId,
                 ResourcesProductionPerMinuteId = WoodcuttersHutL2ResourcesProductionPerMinuteId
@@ -189,7 +202,7 @@ public class Seed
             new()
             {
                 BuildingId = BarracksId,
-                Id = Guid.NewGuid(), Level = 1, BuildingTimeInSeconds = 60,
+                Id = BarracksL1Id, Level = 1, BuildingTimeInSeconds = 60,
                 TrainingTimeShortenedPercentage = 0,
                 ResourcesCostId = BarracksL1ResourcesCostId,
                 ResourcesProductionPerMinuteId = null
@@ -197,7 +210,7 @@ public class Seed
             new()
             {
                 BuildingId = BarracksId,
-                Id = Guid.NewGuid(), Level = 2, BuildingTimeInSeconds = 150,
+                Id = BarracksL2Id, Level = 2, BuildingTimeInSeconds = 150,
                 TrainingTimeShortenedPercentage = 10,
                 ResourcesCostId = BarracksL2ResourcesCostId,
                 ResourcesProductionPerMinuteId = null
@@ -205,7 +218,7 @@ public class Seed
             new()
             {
                 BuildingId = UniversityOfMilitaryTacticsId,
-                Id = Guid.NewGuid(), Level = 1, BuildingTimeInSeconds = 90,
+                Id = UniversityOfMilitaryTacticsL1Id, Level = 1, BuildingTimeInSeconds = 90,
                 TrainingTimeShortenedPercentage = 0,
                 ResourcesCostId = UniversityOfMilitaryTacticsL1ResourcesCostId,
                 ResourcesProductionPerMinuteId = null
@@ -213,7 +226,7 @@ public class Seed
             new()
             {
                 BuildingId = UniversityOfMilitaryTacticsId,
-                Id = Guid.NewGuid(), Level = 2, BuildingTimeInSeconds = 200,
+                Id = UniversityOfMilitaryTacticsL2Id, Level = 2, BuildingTimeInSeconds = 200,
                 TrainingTimeShortenedPercentage = 10,
                 ResourcesCostId = UniversityOfMilitaryTacticsL2ResourcesCostId,
                 ResourcesProductionPerMinuteId = null
@@ -221,7 +234,7 @@ public class Seed
             new()
             {
                 BuildingId = UniversityOfMilitaryTacticsId,
-                Id = Guid.NewGuid(), Level = 3, BuildingTimeInSeconds = 500,
+                Id = UniversityOfMilitaryTacticsL3Id, Level = 3, BuildingTimeInSeconds = 500,
                 TrainingTimeShortenedPercentage = 20,
                 ResourcesCostId = UniversityOfMilitaryTacticsL3ResourcesCostId,
                 ResourcesProductionPerMinuteId = null
@@ -236,28 +249,28 @@ public class Seed
             new()
             {
                 Id = SwordsmanId, Name = "Swordsman", Attack = 10, Defense = 10,
-                IconUrl = new Uri(webAppUrl, "units/swordsman.svg").ToString(), MinBarracksLevel = 2,
+                IconUrl = new Uri(webAppUrl, "units/swordsman.bmp").ToString(), MinBarracksLevel = 2,
                 TrainingCostId = SwordsmanTrainingCostId,
                 TrainingTimeInSeconds = 10
             },
             new()
             {
                 Id = ArcherId, Name = "Archer", Attack = 15, Defense = 5,
-                IconUrl = new Uri(webAppUrl, "units/archer.svg").ToString(), MinBarracksLevel = 1,
+                IconUrl = new Uri(webAppUrl, "units/archer.bmp").ToString(), MinBarracksLevel = 1,
                 TrainingCostId = ArcherTrainingCostId,
                 TrainingTimeInSeconds = 15
             },
             new()
             {
                 Id = KnightId, Name = "Knight", Attack = 20, Defense = 25,
-                IconUrl = new Uri(webAppUrl, "units/knight.svg").ToString(), MinBarracksLevel = 1,
+                IconUrl = new Uri(webAppUrl, "units/knight.bmp").ToString(), MinBarracksLevel = 1,
                 TrainingCostId = KnightTrainingCostId,
                 TrainingTimeInSeconds = 40
             },
             new()
             {
                 Id = KnightOnHorsebackId, Name = "Knight on horseback", Attack = 40, Defense = 20,
-                IconUrl = new Uri(webAppUrl, "units/knight_on_horseback.svg").ToString(),
+                IconUrl = new Uri(webAppUrl, "units/knight_on_horseback.bmp").ToString(),
                 MinBarracksLevel = 3,
                 TrainingCostId = KnightOnHorsebackTrainingCostId,
                 TrainingTimeInSeconds = 60
