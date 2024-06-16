@@ -19,12 +19,13 @@ public class BuildingsInVillageRepository : IBuildingsInVillageRepository
         this.coreDbContext.BuildingsInVillage.Add(buildingInVillage);
     }
 
-    public Task<BuildingInVillage?> GetBuildingInVillageByBuildingSpot(Guid villageId, int buildingSpot)
+    public Task<BuildingInVillage?> GetBuildingInVillageByBuildingSpot(Guid villageId, int buildingSpot,
+        CancellationToken cancellationToken)
     {
         return this.coreDbContext.BuildingsInVillage
             .Include(b => b.Building)
             .Include(b => b.Village)
             .Include(b => b.BuildingQueue)
-            .FirstOrDefaultAsync(b => b.Village.Id == villageId && b.BuildingSpot == buildingSpot);
+            .FirstOrDefaultAsync(b => b.Village.Id == villageId && b.BuildingSpot == buildingSpot, cancellationToken);
     }
 }

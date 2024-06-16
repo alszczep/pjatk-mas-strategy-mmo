@@ -7,8 +7,8 @@ public class VillageDetailsDTO
     public string? CrestImageUrl { get; set; }
     public List<VillageDetailsMilitaryUnitDTO> MilitaryUnits { get; set; } = null!;
     public List<VillageDetailsBuildingDTO> Buildings { get; set; } = null!;
-    public VillageDetailsResourcesDTO AvailableResources { get; set; } = null!;
-    public VillageDetailsResourcesDTO ResourcesProductionPerMinute { get; set; } = null!;
+    public ResourcesDTO AvailableResources { get; set; } = null!;
+    public ResourcesDTO ResourcesProductionPerMinute { get; set; } = null!;
     public List<VillageDetailsMilitaryUnitQueueDTO> MilitaryUnitsQueue { get; set; } = null!;
     public List<VillageDetailsBuildingQueueDTO> BuildingsQueue { get; set; } = null!;
 }
@@ -28,14 +28,6 @@ public class VillageDetailsBuildingDTO
     public int Level { get; set; }
     public string? ImageUrl { get; set; }
     public int BuildingSpot { get; set; }
-}
-
-public class VillageDetailsResourcesDTO
-{
-    public int Wood { get; set; }
-    public int Iron { get; set; }
-    public int Wheat { get; set; }
-    public int Gold { get; set; }
 }
 
 public class VillageDetailsMilitaryUnitQueueDTO

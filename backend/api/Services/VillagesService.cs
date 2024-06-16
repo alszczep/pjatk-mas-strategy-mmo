@@ -50,7 +50,7 @@ public class VillagesService : IVillagesService
                 Level = building.Level,
                 ImageUrl = building.Building.ImageUrl
             }).ToList(),
-            AvailableResources = new VillageDetailsResourcesDTO
+            AvailableResources = new ResourcesDTO
             {
                 Wood = village.AvailableResources.Wood,
                 Iron = village.AvailableResources.Iron,
@@ -67,7 +67,7 @@ public class VillagesService : IVillagesService
                     ).Where(b => b.Building.Type == BuildingType.Resources)
                     .Select(b => b.Building.Levels.FirstOrDefault(bl => bl.Level == b.Level))
                     .Where(bl => bl is { ResourcesProductionPerMinute: not null })
-                    .Aggregate(new VillageDetailsResourcesDTO()
+                    .Aggregate(new ResourcesDTO
                     {
                         Wood = 0,
                         Iron = 0,

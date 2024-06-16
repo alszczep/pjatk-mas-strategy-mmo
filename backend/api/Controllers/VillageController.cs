@@ -36,20 +36,17 @@ public class VillageController : ControllerBase
         };
     }
 
-    [HttpGet("byOwner")]
-    public async Task<ActionResult<VillageDetailsDTO>> GetVillageByOwner(CancellationToken cancellationToken)
+    [HttpGet("villageIdByOwner")]
+    public async Task<ActionResult<Guid>> GetVillageIdByOwner(CancellationToken cancellationToken)
     {
         var userId = this.authorizationService.ExtractUserId(this.Request);
 
         if (!userId.HasValue) return this.Unauthorized();
 
-        VillageDetailsDTO? village = await this.villagesService.GetVillageByUserId(userId.Value, cancellationToken);
+        var villageId = (await this.villagesService.GetVillageByUserId(userId.Value, cancellationToken))?.Id;
 
-        if (village == null) return this.Unauthorized();
+        if (villageId == null) return this.Unauthorized();
 
-        return new VillageDetailsDTO
-        {
-            Name = village.Name
-        };
+        return villageId.Value;
     }
 }
