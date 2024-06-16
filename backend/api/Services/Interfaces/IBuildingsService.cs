@@ -5,8 +5,10 @@ namespace api.Services.Interfaces;
 
 public interface IBuildingsService
 {
-    void ScheduleBuilding(Guid villageId, int buildingSpot, Guid buildingId);
-    void ScheduleUpgrade(Guid villageId, int buildingSpot);
+    Task ScheduleBuilding(Guid villageId, int buildingSpot, Guid buildingId, CancellationToken cancellationToken);
+    Task ScheduleUpgrade(Guid villageId, int buildingSpot, CancellationToken cancellationToken);
+    Task UpdateBuildingsQueueForVillage(Guid villageId, CancellationToken cancellationToken);
+    Task UpdateBuildingsQueueGlobally(CancellationToken cancellationToken);
 
     Task<BuildingDetailsDTO?> GetBuildingByBuildingSpot(Guid villageId, int buildingSpot,
         CancellationToken cancellationToken);

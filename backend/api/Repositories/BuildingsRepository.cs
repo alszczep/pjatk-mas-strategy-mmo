@@ -24,4 +24,15 @@ public class BuildingsRepository : IBuildingsRepository
             .Where(b => b.InVillages.Count(bv => bv.Village.Id == villageId) < b.MaxInVillage)
             .ToListAsync(cancellationToken);
     }
+
+    public Task<Building?> GetBuildingById(Guid buildingId, CancellationToken cancellationToken)
+    {
+        return this.coreDbContext.Buildings
+            .Include(b => b.Levels)
+            .ThenInclude(l => l.ResourcesCost)
+            .Include(b => b.InVillages)
+            .ThenInclude(b => b.Village)
+            .Where(b => b.Id == buildingId)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
 }

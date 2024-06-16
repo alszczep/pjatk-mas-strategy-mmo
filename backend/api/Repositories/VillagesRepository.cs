@@ -46,4 +46,12 @@ public class VillagesRepository : IVillagesRepository
         return this.HandleVillageIncludes(this.coreDbContext.Villages
             .Where(v => v.OwnerId == userId), cancellationToken);
     }
+
+    public Task<Village?> GetVillageByIdWithResourcesOnly(Guid villageId, CancellationToken cancellationToken)
+    {
+        return this.coreDbContext.Villages
+            .Where(v => v.Id == villageId)
+            .Include(r => r.AvailableResources)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
 }

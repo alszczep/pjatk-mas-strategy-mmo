@@ -7,29 +7,141 @@ namespace api.Services;
 
 public class BuildingsService : IBuildingsService
 {
-    private readonly IConfiguration configuration;
     private readonly IDbTransactionRepository dbTransactionRepository;
     private readonly IBuildingsRepository buildingsRepository;
     private readonly IBuildingsInVillageRepository buildingsInVillageRepository;
+    private readonly IVillagesRepository villagesRepository;
+    private readonly IBuildingsQueueRepository buildingsQueueRepository;
 
-    public BuildingsService(IConfiguration configuration, IDbTransactionRepository dbTransactionRepository,
+    public BuildingsService(IDbTransactionRepository dbTransactionRepository,
         IBuildingsRepository buildingsRepository,
-        IBuildingsInVillageRepository buildingsInVillageRepository)
+        IBuildingsInVillageRepository buildingsInVillageRepository, IVillagesRepository villagesRepository,
+        IBuildingsQueueRepository buildingsQueueRepository)
     {
-        this.configuration = configuration;
         this.dbTransactionRepository = dbTransactionRepository;
         this.buildingsRepository = buildingsRepository;
         this.buildingsInVillageRepository = buildingsInVillageRepository;
+        this.villagesRepository = villagesRepository;
+        this.buildingsQueueRepository = buildingsQueueRepository;
     }
 
-    public void ScheduleBuilding(Guid villageId, int buildingSpot, Guid buildingId)
+    public async Task ScheduleBuilding(Guid villageId, int buildingSpot, Guid buildingId,
+        CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        BuildingInVillage? buildingInVillage =
+            await this.buildingsInVillageRepository.GetBuildingInVillageByBuildingSpot(villageId, buildingSpot,
+                cancellationToken);
+
+        if (buildingInVillage != null) throw new InvalidOperationException("Building already exists");
+
+        Building? building = await this.buildingsRepository.GetBuildingById(buildingId, cancellationToken);
+
+        if (building == null) throw new InvalidOperationException("Building not found");
+
+        if (building.InVillages.Count(v => v.Village.Id == villageId) >= building.MaxInVillage)
+            throw new InvalidOperationException("Buildings limit reached");
+
+        Village? village = await this.villagesRepository.GetVillageByIdWithResourcesOnly(villageId, cancellationToken);
+
+        if (village == null) throw new InvalidOperationException("Village not found");
+
+        BuildingLevel level = building.Levels.First(l => l.Level == 1);
+
+        if (!(village.AvailableResources >= level.ResourcesCost))
+            throw new InvalidOperationException("Not enough resources");
+
+        BuildingInVillage newBuildingInVillage = new()
+        {
+            Id = Guid.NewGuid(),
+            Building = building,
+            Village = village,
+            BuildingSpot = buildingSpot,
+            Level = 0
+        };
+
+        BuildingsQueue buildingQueue = new()
+        {
+            Id = Guid.NewGuid(),
+            BuildingInVillage = newBuildingInVillage,
+            StartTime = DateTime.UtcNow,
+            EndTime = DateTime.UtcNow + TimeSpan.FromSeconds(level.BuildingTimeInSeconds),
+            LevelAfterUpgrade = 1
+        };
+
+        this.buildingsInVillageRepository.AddBuildingInVillage(newBuildingInVillage);
+        this.buildingsQueueRepository.AddBuildingsQueueItem(buildingQueue);
+        village.AvailableResources -= level.ResourcesCost;
+
+        await this.dbTransactionRepository.SaveChangesAsync(cancellationToken);
     }
 
-    public void ScheduleUpgrade(Guid villageId, int buildingSpot)
+    public async Task ScheduleUpgrade(Guid villageId, int buildingSpot, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        BuildingInVillage? buildingInVillage =
+            await this.buildingsInVillageRepository.GetBuildingInVillageByBuildingSpot(villageId, buildingSpot,
+                cancellationToken);
+
+        if (buildingInVillage == null) throw new InvalidOperationException("Building not found");
+
+        BuildingsQueue? lastInQueue = buildingInVillage.BuildingQueue.MaxBy(q => q.EndTime);
+        int levelToBeBuilt = lastInQueue is null ? buildingInVillage.Level + 1 : lastInQueue.LevelAfterUpgrade + 1;
+
+        BuildingLevel? buildingLevelToBeBuilt =
+            buildingInVillage.Building.Levels.FirstOrDefault(l => l.Level == levelToBeBuilt);
+
+        if (buildingLevelToBeBuilt == null) throw new InvalidOperationException("Building level not found");
+
+        Village? village =
+            await this.villagesRepository.GetVillageByIdWithResourcesOnly(villageId, cancellationToken);
+
+        if (village == null) throw new InvalidOperationException("Village not found");
+
+        if (!(village.AvailableResources >= buildingLevelToBeBuilt.ResourcesCost))
+            throw new InvalidOperationException("Not enough resources");
+
+        BuildingsQueue buildingQueue = new()
+        {
+            Id = Guid.NewGuid(),
+            BuildingInVillage = buildingInVillage,
+            StartTime = lastInQueue?.EndTime ?? DateTime.UtcNow,
+            EndTime = lastInQueue?.EndTime ??
+                      DateTime.UtcNow + TimeSpan.FromSeconds(buildingLevelToBeBuilt.BuildingTimeInSeconds),
+            LevelAfterUpgrade = levelToBeBuilt
+        };
+
+        this.buildingsQueueRepository.AddBuildingsQueueItem(buildingQueue);
+        village.AvailableResources -= buildingLevelToBeBuilt.ResourcesCost;
+
+        await this.dbTransactionRepository.SaveChangesAsync(cancellationToken);
+    }
+
+    private static void UpdateBuildingQueue(List<BuildingsQueue> queue)
+    {
+        queue.GroupBy(q => q.BuildingInVillage.Id).ToList().ForEach(group =>
+        {
+            BuildingInVillage buildingInVillage = group.First().BuildingInVillage;
+            var finishedBuildingQueue = group.ToList().Where(bq => bq.EndTime <= DateTime.UtcNow).ToList();
+            int? highestLevel = finishedBuildingQueue.MaxBy(q => q.LevelAfterUpgrade)?.LevelAfterUpgrade;
+
+            if (!highestLevel.HasValue) return;
+
+            buildingInVillage.Level = highestLevel.Value;
+            finishedBuildingQueue.ForEach(q => buildingInVillage.BuildingQueue.Remove(q));
+        });
+    }
+
+    public async Task UpdateBuildingsQueueForVillage(Guid villageId, CancellationToken cancellationToken)
+    {
+        var queue = await this.buildingsQueueRepository.GetBuildingsQueueForVillage(villageId, cancellationToken);
+        UpdateBuildingQueue(queue);
+        await this.dbTransactionRepository.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task UpdateBuildingsQueueGlobally(CancellationToken cancellationToken)
+    {
+        var queue = await this.buildingsQueueRepository.GetBuildingsQueue(cancellationToken);
+        UpdateBuildingQueue(queue);
+        await this.dbTransactionRepository.SaveChangesAsync(cancellationToken);
     }
 
     public async Task<BuildingDetailsDTO?> GetBuildingByBuildingSpot(Guid villageId, int buildingSpot,

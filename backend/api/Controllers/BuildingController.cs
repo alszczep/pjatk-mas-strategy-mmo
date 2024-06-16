@@ -29,11 +29,31 @@ public class BuildingController : ControllerBase
         return await this.buildingsService.GetBuildableBuildings(villageId, cancellationToken);
     }
 
-    [HttpPost("buildingDetails")]
-    public async Task<ActionResult<BuildingDetailsDTO?>> GetBuildingDetails(
+    [HttpPost("scheduleBuilding")]
+    public async Task<ActionResult> ScheduleBuilding(
+        [FromBody] BuildingDetailsParametersWithBuildingIdDTO dto, CancellationToken cancellationToken)
+    {
+        await this.buildingsService.ScheduleBuilding(dto.VillageId, dto.BuildingSpot, dto.BuildingId,
+            cancellationToken);
+
+        return this.Ok();
+    }
+
+    [HttpPost("scheduleUpgrade")]
+    public async Task<ActionResult> ScheduleUpgrade(
         [FromBody] BuildingDetailsParametersDTO dto, CancellationToken cancellationToken)
     {
-        return await this.buildingsService.GetBuildingByBuildingSpot(dto.VillageId, dto.BuildingSpot,
+        await this.buildingsService.ScheduleUpgrade(dto.VillageId, dto.BuildingSpot,
             cancellationToken);
+
+        return this.Ok();
+    }
+
+    [HttpPost("forceQueueUpdate/{villageId}")]
+    public async Task<ActionResult> ForceQueueUpdate(Guid villageId, CancellationToken cancellationToken)
+    {
+        await this.buildingsService.UpdateBuildingsQueueForVillage(villageId, cancellationToken);
+
+        return this.Ok();
     }
 }
