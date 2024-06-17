@@ -1,4 +1,5 @@
 using api.Controllers.DTOs;
+using api.Helpers;
 using api.Models;
 using api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -44,14 +45,33 @@ public class UserController : ControllerBase
 
 
     [HttpPost("register")]
-    public async Task<ActionResult<TokenDTO>> Register([FromBody] UserAuthDTO dto, CancellationToken cancellationToken)
+    public async Task<ActionResult<ResultOrError<string>>> Register([FromBody] UserAuthDTO dto,
+        CancellationToken cancellationToken)
     {
-        if (!this.usersService.IsUsernameValid(dto.Username))
-            return this.BadRequest(
-                "Username must but 120 characters or shorter");
-        if (!this.usersService.IsPasswordValid(dto.Password))
-            return this.BadRequest(
-                "Password must but 120 characters or shorter");
+        if (dto.Username.Trim() == string.Empty)
+            return new ResultOrError<string>()
+            {
+                Result = null,
+                Error = "Username must not be empty"
+            };
+        if (dto.Password.Trim() == string.Empty)
+            return new ResultOrError<string>()
+            {
+                Result = null,
+                Error = "Password must not be empty"
+            };
+        if (!this.usersService.IsUsernameNotTooLong(dto.Username))
+            return new ResultOrError<string>()
+            {
+                Result = null,
+                Error = "Username must but 120 characters or shorter"
+            };
+        if (!this.usersService.IsPasswordNotTooLong(dto.Password))
+            return new ResultOrError<string>()
+            {
+                Result = null,
+                Error = "Password must but 120 characters or shorter"
+            };
 
         User user = this.usersService.CreateUser(dto.Username, dto.Password);
         await this.villagesService.CreateVillage(dto.Username + "'s Village", user, cancellationToken);
@@ -62,9 +82,9 @@ public class UserController : ControllerBase
 
         await this.usersService.SaveChangesAsync(cancellationToken);
 
-        return new TokenDTO()
+        return new ResultOrError<string>()
         {
-            Token = user.JwtToken
+            Result = user.JwtToken
         };
     }
 }

@@ -17,11 +17,16 @@
 
   const $toast = useToast()
 
-  const upgrade = () => {
-    scheduleUpgradeEndpoint(villageId, placeInVillage).then(() => {
-      $toast.success("Building upgrade scheduled")
-      router.push(routes.game.village.withParam(villageId))
-    })
+  const upgrade = async () => {
+    const result = await scheduleUpgradeEndpoint(villageId, placeInVillage)
+
+    if (result.error) {
+      $toast.error(result.error)
+      return
+    }
+
+    $toast.success("Building upgrade scheduled")
+    router.push(routes.game.village.withParam(villageId))
   }
 </script>
 

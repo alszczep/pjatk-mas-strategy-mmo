@@ -10,3 +10,7 @@ public class ResultOrError<T>
     public bool IsResult => this.Error == null;
     public bool IsError => this.Error != null;
 }
+
+public class ResultOrError : ResultOrError<bool>
+{
+}

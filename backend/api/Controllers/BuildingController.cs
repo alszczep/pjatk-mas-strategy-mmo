@@ -1,4 +1,5 @@
 using api.Controllers.DTOs;
+using api.Helpers;
 using api.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -36,23 +37,18 @@ public class BuildingController : ControllerBase
     }
 
     [HttpPost("scheduleBuilding")]
-    public async Task<ActionResult> ScheduleBuilding(
+    public async Task<ActionResult<ResultOrError>> ScheduleBuilding(
         [FromBody] BuildingDetailsParametersWithBuildingIdDTO dto, CancellationToken cancellationToken)
     {
-        await this.buildingsService.ScheduleBuilding(dto.VillageId, dto.BuildingSpot, dto.BuildingId,
+        return await this.buildingsService.ScheduleBuilding(dto.VillageId, dto.BuildingSpot, dto.BuildingId,
             cancellationToken);
-
-        return this.Ok();
     }
 
     [HttpPost("scheduleUpgrade")]
-    public async Task<ActionResult> ScheduleUpgrade(
+    public async Task<ActionResult<ResultOrError>> ScheduleUpgrade(
         [FromBody] BuildingDetailsParametersDTO dto, CancellationToken cancellationToken)
     {
-        await this.buildingsService.ScheduleUpgrade(dto.VillageId, dto.BuildingSpot,
-            cancellationToken);
-
-        return this.Ok();
+        return await this.buildingsService.ScheduleUpgrade(dto.VillageId, dto.BuildingSpot, cancellationToken);
     }
 
     [HttpPost("updateBuildingsQueue/{villageId}")]

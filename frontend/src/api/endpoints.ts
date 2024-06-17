@@ -11,7 +11,10 @@ export const loginEndpoint = (Username: string, Password: string) =>
   })
 
 export const registerEndpoint = (Username: string, Password: string) =>
-  apiFetch<TokenDTO>("user/register", "POST", { Username, Password })
+  apiFetch<ResultOrError<string>>("user/register", "POST", {
+    Username,
+    Password,
+  })
 
 export const villageIdByOwnerEndpoint = () =>
   apiFetch<string>("village/villageIdByOwner", "GET")
@@ -39,7 +42,7 @@ export const scheduleBuildingEndpoint = (
   BuildingSpot: number,
   BuildingId: string,
 ) =>
-  apiFetch("building/scheduleBuilding", "POST", {
+  apiFetch<ResultOrError>("building/scheduleBuilding", "POST", {
     VillageId,
     BuildingSpot,
     BuildingId,
@@ -48,7 +51,11 @@ export const scheduleBuildingEndpoint = (
 export const scheduleUpgradeEndpoint = (
   VillageId: string,
   BuildingSpot: number,
-) => apiFetch("building/scheduleUpgrade", "POST", { VillageId, BuildingSpot })
+) =>
+  apiFetch<ResultOrError>("building/scheduleUpgrade", "POST", {
+    VillageId,
+    BuildingSpot,
+  })
 
 export const updateBuildingsQueueEndpoint = (villageId: string) =>
   apiFetch(`building/updateBuildingsQueue/${villageId}`, "POST")
@@ -58,18 +65,11 @@ export const scheduleMilitaryUnitTrainingEndpoint = (
   MilitaryUnitId: string,
   Amount: number,
 ) =>
-  apiFetch<ResultOrError<boolean>>(
-    "militaryUnit/scheduleMilitaryUnitTraining",
-    "POST",
-    {
-      VillageId,
-      MilitaryUnitId,
-      Amount,
-    },
-  )
+  apiFetch<ResultOrError>("militaryUnit/scheduleMilitaryUnitTraining", "POST", {
+    VillageId,
+    MilitaryUnitId,
+    Amount,
+  })
 
 export const updateMilitaryUnitsQueueEndpoint = (VillageId: string) =>
-  apiFetch<ResultOrError<boolean>>(
-    `militaryUnit/updateMilitaryUnitsQueue/${VillageId}`,
-    "POST",
-  )
+  apiFetch(`militaryUnit/updateMilitaryUnitsQueue/${VillageId}`, "POST")

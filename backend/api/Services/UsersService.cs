@@ -28,12 +28,12 @@ public class UsersService : IUsersService
         return this.dbTransactionRepository.SaveChangesAsync(cancellationToken);
     }
 
-    public bool IsUsernameValid(string username)
+    public bool IsUsernameNotTooLong(string username)
     {
         return username.Length <= 120;
     }
 
-    public bool IsPasswordValid(string password)
+    public bool IsPasswordNotTooLong(string password)
     {
         return password.Length <= 120;
     }

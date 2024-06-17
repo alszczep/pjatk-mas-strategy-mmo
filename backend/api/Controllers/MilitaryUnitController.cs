@@ -23,27 +23,16 @@ public class MilitaryUnitController : ControllerBase
     }
 
     [HttpPost("scheduleMilitaryUnitTraining")]
-    public async Task<ActionResult<ResultOrError<bool>>> ScheduleBuilding(
+    public async Task<ActionResult<ResultOrError>> ScheduleBuilding(
         [FromBody] MilitaryUnitParametersDTO dto, CancellationToken cancellationToken)
     {
-        try
-        {
-            return await this.militaryUnitsService.ScheduleMilitaryUnitTraining(dto.VillageId, dto.MilitaryUnitId,
-                dto.Amount,
-                cancellationToken);
-        }
-        catch (Exception e)
-        {
-            return new ResultOrError<bool>()
-            {
-                Result = false,
-                Error = ResultOrError<bool>.ServerError
-            };
-        }
+        return await this.militaryUnitsService.ScheduleMilitaryUnitTraining(dto.VillageId, dto.MilitaryUnitId,
+            dto.Amount,
+            cancellationToken);
     }
 
     [HttpPost("updateMilitaryUnitsQueue/{villageId}")]
-    public async Task<ActionResult<ResultOrError<bool>>> UpdateBuildingsQueue(Guid villageId,
+    public async Task<ActionResult> UpdateBuildingsQueue(Guid villageId,
         CancellationToken cancellationToken)
     {
         await this.militaryUnitsService.UpdateMilitaryUnitsQueueForVillage(villageId, cancellationToken);

@@ -1,4 +1,5 @@
 using api.Controllers.DTOs;
+using api.Helpers;
 using api.Models;
 using api.Repositories.Interfaces;
 using api.Services.Interfaces;
@@ -12,45 +13,81 @@ public class BuildingsService : IBuildingsService
     private readonly IBuildingsInVillageRepository buildingsInVillageRepository;
     private readonly IVillagesRepository villagesRepository;
     private readonly IBuildingsQueueRepository buildingsQueueRepository;
+    private readonly ILogger<BuildingsService> logger;
 
     public BuildingsService(IDbTransactionRepository dbTransactionRepository,
         IBuildingsRepository buildingsRepository,
         IBuildingsInVillageRepository buildingsInVillageRepository, IVillagesRepository villagesRepository,
-        IBuildingsQueueRepository buildingsQueueRepository)
+        IBuildingsQueueRepository buildingsQueueRepository,
+        ILogger<BuildingsService> logger)
     {
         this.dbTransactionRepository = dbTransactionRepository;
         this.buildingsRepository = buildingsRepository;
         this.buildingsInVillageRepository = buildingsInVillageRepository;
         this.villagesRepository = villagesRepository;
         this.buildingsQueueRepository = buildingsQueueRepository;
+        this.logger = logger;
     }
 
-    public async Task ScheduleBuilding(Guid villageId, int buildingSpot, Guid buildingId,
+    public async Task<ResultOrError> ScheduleBuilding(Guid villageId, int buildingSpot, Guid buildingId,
         CancellationToken cancellationToken)
     {
         BuildingInVillage? buildingInVillage =
             await this.buildingsInVillageRepository.GetBuildingInVillageByBuildingSpot(villageId, buildingSpot,
                 cancellationToken);
 
-        if (buildingInVillage != null) throw new InvalidOperationException("Building already exists");
+        if (buildingInVillage != null)
+        {
+            this.logger.LogError("Building already exists");
+            return new ResultOrError()
+            {
+                Error = ResultOrError.ServerError
+            };
+        }
 
         Building? building = await this.buildingsRepository.GetBuildingById(buildingId, cancellationToken);
 
-        if (building == null) throw new InvalidOperationException("Building not found");
+        if (building == null)
+        {
+            this.logger.LogError("Building not found");
+            return new ResultOrError()
+            {
+                Error = ResultOrError.ServerError
+            };
+        }
 
         if (building.InVillages.Count(v => v.Village.Id == villageId) >= building.MaxInVillage)
-            throw new InvalidOperationException("Buildings limit reached");
+        {
+            this.logger.LogError("Buildings limit reached");
+            return new ResultOrError()
+            {
+                Error = ResultOrError.ServerError
+            };
+        }
 
         Village? village = await this.villagesRepository.GetVillageByIdWithResourcesOnly(villageId, cancellationToken);
 
-        if (village == null) throw new InvalidOperationException("Village not found");
+        if (village == null)
+        {
+            this.logger.LogError("Village not found");
+            return new ResultOrError()
+            {
+                Error = ResultOrError.ServerError
+            };
+        }
 
         BuildingLevel level = building.Levels.First(l => l.Level == 1);
 
         if (level.ResourcesCost > village.AvailableResources)
-            throw new InvalidOperationException("Not enough resources");
+        {
+            this.logger.LogError("Not enough resources");
+            return new ResultOrError()
+            {
+                Error = "Not enough resources"
+            };
+        }
 
-        List<BuildingsQueue> currentQueue =
+        var currentQueue =
             await this.buildingsQueueRepository.GetBuildingsQueueForVillage(villageId, cancellationToken);
         BuildingsQueue? lastInQueue = currentQueue.MaxBy(q => q.EndTime);
 
@@ -77,15 +114,28 @@ public class BuildingsService : IBuildingsService
         this.buildingsQueueRepository.AddBuildingsQueueItem(buildingQueue);
 
         await this.dbTransactionRepository.SaveChangesAsync(cancellationToken);
+
+        return new ResultOrError()
+        {
+            Result = true
+        };
     }
 
-    public async Task ScheduleUpgrade(Guid villageId, int buildingSpot, CancellationToken cancellationToken)
+    public async Task<ResultOrError> ScheduleUpgrade(Guid villageId, int buildingSpot,
+        CancellationToken cancellationToken)
     {
         BuildingInVillage? buildingInVillage =
             await this.buildingsInVillageRepository.GetBuildingInVillageByBuildingSpot(villageId, buildingSpot,
                 cancellationToken);
 
-        if (buildingInVillage == null) throw new InvalidOperationException("Building not found");
+        if (buildingInVillage == null)
+        {
+            this.logger.LogError("Building not found");
+            return new ResultOrError()
+            {
+                Error = ResultOrError.ServerError
+            };
+        }
 
         BuildingsQueue? lastSameBuildingInQueue = buildingInVillage.BuildingQueue.MaxBy(q => q.EndTime);
         int levelToBeBuilt = lastSameBuildingInQueue is null
@@ -95,17 +145,37 @@ public class BuildingsService : IBuildingsService
         BuildingLevel? buildingLevelToBeBuilt =
             buildingInVillage.Building.Levels.FirstOrDefault(l => l.Level == levelToBeBuilt);
 
-        if (buildingLevelToBeBuilt == null) throw new InvalidOperationException("Building level not found");
+        if (buildingLevelToBeBuilt == null)
+        {
+            this.logger.LogError("Building level not found");
+            return new ResultOrError()
+            {
+                Error = ResultOrError.ServerError
+            };
+        }
 
         Village? village =
             await this.villagesRepository.GetVillageByIdWithResourcesOnly(villageId, cancellationToken);
 
-        if (village == null) throw new InvalidOperationException("Village not found");
+        if (village == null)
+        {
+            this.logger.LogError("Village not found");
+            return new ResultOrError()
+            {
+                Error = ResultOrError.ServerError
+            };
+        }
 
         if (buildingLevelToBeBuilt.ResourcesCost > village.AvailableResources)
-            throw new InvalidOperationException("Not enough resources");
+        {
+            this.logger.LogError("Not enough resources");
+            return new ResultOrError()
+            {
+                Error = "Not enough resources"
+            };
+        }
 
-        List<BuildingsQueue> currentQueue =
+        var currentQueue =
             await this.buildingsQueueRepository.GetBuildingsQueueForVillage(villageId, cancellationToken);
         BuildingsQueue? lastInQueue = currentQueue.MaxBy(q => q.EndTime);
 
@@ -123,6 +193,11 @@ public class BuildingsService : IBuildingsService
         village.AvailableResources -= buildingLevelToBeBuilt.ResourcesCost;
 
         await this.dbTransactionRepository.SaveChangesAsync(cancellationToken);
+
+        return new ResultOrError()
+        {
+            Result = true
+        };
     }
 
     private static void UpdateBuildingQueue(List<BuildingsQueue> queue)

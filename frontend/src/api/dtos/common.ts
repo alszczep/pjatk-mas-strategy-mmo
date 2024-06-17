@@ -5,7 +5,7 @@ export type ResourcesDTO = {
   gold: number
 }
 
-export type ResultOrError<T> = {
+export type ResultOrError<T = boolean> = {
   result?: T
   error?: string
 }

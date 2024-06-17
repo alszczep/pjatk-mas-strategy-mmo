@@ -29,15 +29,14 @@ public class MilitaryUnitsService : IMilitaryUnitsService
         this.logger = logger;
     }
 
-    public async Task<ResultOrError<bool>> ScheduleMilitaryUnitTraining(Guid villageId, Guid militaryUnitId, int amount,
+    public async Task<ResultOrError> ScheduleMilitaryUnitTraining(Guid villageId, Guid militaryUnitId, int amount,
         CancellationToken cancellationToken)
     {
         if (amount <= 0)
         {
             this.logger.LogError("Amount must be greater than 0");
-            return new ResultOrError<bool>()
+            return new ResultOrError()
             {
-                Result = false,
                 Error = "Amount must be greater than 0"
             };
         }
@@ -48,10 +47,9 @@ public class MilitaryUnitsService : IMilitaryUnitsService
         if (militaryUnit == null)
         {
             this.logger.LogError("Military unit not found");
-            return new ResultOrError<bool>()
+            return new ResultOrError()
             {
-                Result = false,
-                Error = ResultOrError<bool>.ServerError
+                Error = ResultOrError.ServerError
             };
         }
 
@@ -60,10 +58,9 @@ public class MilitaryUnitsService : IMilitaryUnitsService
         if (village == null)
         {
             this.logger.LogError("Village not found");
-            return new ResultOrError<bool>()
+            return new ResultOrError()
             {
-                Result = false,
-                Error = ResultOrError<bool>.ServerError
+                Error = ResultOrError.ServerError
             };
         }
 
@@ -84,9 +81,8 @@ public class MilitaryUnitsService : IMilitaryUnitsService
         if (barracksLevel == null)
         {
             this.logger.LogError("No barracks or barracks level too low");
-            return new ResultOrError<bool>()
+            return new ResultOrError()
             {
-                Result = false,
                 Error = "Barracks level too low"
             };
         }
@@ -96,9 +92,8 @@ public class MilitaryUnitsService : IMilitaryUnitsService
         if (totalCost > village.AvailableResources)
         {
             this.logger.LogError("Not enough resources");
-            return new ResultOrError<bool>()
+            return new ResultOrError()
             {
-                Result = false,
                 Error = "Not enough resources"
             };
         }
@@ -129,7 +124,7 @@ public class MilitaryUnitsService : IMilitaryUnitsService
 
         await this.dbTransactionRepository.SaveChangesAsync(cancellationToken);
 
-        return new ResultOrError<bool>()
+        return new ResultOrError()
         {
             Result = true
         };

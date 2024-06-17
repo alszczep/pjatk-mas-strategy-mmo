@@ -14,10 +14,19 @@
   const $toast = useToast()
 
   const build = async (buildingId: string) => {
-    scheduleBuildingEndpoint(villageId, placeInVillage, buildingId).then(() => {
-      $toast.success("Building construction scheduled")
-      router.push(routes.game.village.withParam(villageId))
-    })
+    const result = await scheduleBuildingEndpoint(
+      villageId,
+      placeInVillage,
+      buildingId,
+    )
+
+    if (result.error) {
+      $toast.error(result.error)
+      return
+    }
+
+    $toast.success("Building construction scheduled")
+    router.push(routes.game.village.withParam(villageId))
   }
 </script>
 

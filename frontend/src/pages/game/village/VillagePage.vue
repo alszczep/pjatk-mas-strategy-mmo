@@ -45,12 +45,7 @@
       return
     }
 
-    const response = await updateMilitaryUnitsQueueEndpoint(villageId)
-    if (response.error) {
-      $toast.error(response.error)
-      return
-    }
-
+    await updateMilitaryUnitsQueueEndpoint(villageId)
     fetchVillage()
   }
 </script>
