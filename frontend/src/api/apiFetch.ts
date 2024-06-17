@@ -2,11 +2,16 @@ import { useToast } from "vue-toast-notification"
 import { authTokenKey } from "../auth"
 import { config } from "../config"
 
+export const unknownErrorMessage = "Unknown error occurred"
+
 export const apiFetch = async <T = undefined>(
   endpoint: string,
   method: "GET" | "POST" | "PUT" | "DELETE",
   body?: object,
-  options?: RequestInit,
+  fetchOptions?: RequestInit,
+  options?: {
+    noErrorToast?: boolean
+  },
 ): Promise<T> => {
   const url = new URL(endpoint, config.apiBaseUrl)
   const response = await fetch(url, {
@@ -16,9 +21,9 @@ export const apiFetch = async <T = undefined>(
       "Content-Type": "application/json",
       Authorization: `Bearer ${localStorage.getItem(authTokenKey)}`,
       credentials: "include",
-      ...options?.headers,
+      ...fetchOptions?.headers,
     },
-    ...options,
+    ...fetchOptions,
   })
 
   if (response.status === 204) {
@@ -30,6 +35,14 @@ export const apiFetch = async <T = undefined>(
   }
 
   const $toast = useToast()
-  $toast.error("Network error")
-  throw new Error(JSON.stringify(response))
+
+  if (!options?.noErrorToast) {
+    if (response.status === 401) {
+      $toast.error("Unauthorized")
+    } else {
+      $toast.error(unknownErrorMessage)
+    }
+  }
+
+  throw new Error(response.status.toString())
 }

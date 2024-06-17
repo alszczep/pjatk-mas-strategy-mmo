@@ -32,6 +32,16 @@ public class MilitaryUnitsService : IMilitaryUnitsService
     public async Task<ResultOrError<bool>> ScheduleMilitaryUnitTraining(Guid villageId, Guid militaryUnitId, int amount,
         CancellationToken cancellationToken)
     {
+        if (amount <= 0)
+        {
+            this.logger.LogError("Amount must be greater than 0");
+            return new ResultOrError<bool>()
+            {
+                Result = false,
+                Error = "Amount must be greater than 0"
+            };
+        }
+
         MilitaryUnit? militaryUnit =
             await this.militaryUnitsRepository.GetMilitaryUnitById(militaryUnitId, cancellationToken);
 

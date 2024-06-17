@@ -6,7 +6,9 @@ import type { VillageDetailsDTO } from "./dtos/VillageDetailsDTO"
 import type { ResultOrError } from "./dtos/common"
 
 export const loginEndpoint = (Username: string, Password: string) =>
-  apiFetch<TokenDTO>("user/login", "POST", { Username, Password })
+  apiFetch<TokenDTO>("user/login", "POST", { Username, Password }, undefined, {
+    noErrorToast: true,
+  })
 
 export const registerEndpoint = (Username: string, Password: string) =>
   apiFetch<TokenDTO>("user/register", "POST", { Username, Password })
