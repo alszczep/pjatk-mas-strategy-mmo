@@ -15,7 +15,7 @@
     class="wrapper"
   >
     <img :src="imageUrl" class="image" />
-    <div v-if="level" class="level">{{ level }}</div>
+    <div v-if="level !== undefined" class="level">{{ level }}</div>
     <div class="background" />
   </router-link>
 </template>

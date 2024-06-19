@@ -1,14 +1,16 @@
 <script setup lang="ts">
+  import type { VillageDetailsBuildingDTO } from "../../api/dtos/VillageDetailsDTO"
   import Building from "./Building.vue"
-  import type { BuildingSummaryDTO } from "../../api/dtos"
+
   import {
     buildingGridHeight,
     buildingGridWidth,
     buildingPlaceToGridPosition,
   } from "./buildingsGridConfig"
+  import { computed } from "vue"
 
   const { buildings, villageId } = defineProps<{
-    buildings: BuildingSummaryDTO[]
+    buildings: VillageDetailsBuildingDTO[]
     villageId: string
   }>()
 
@@ -24,14 +26,14 @@
     }
   }
 
-  const buildingsWithPosition = buildingPlaceToGridPosition.map(
-    (position, index) => {
+  const buildingsWithPosition = computed(() =>
+    buildingPlaceToGridPosition.map((position, index) => {
       return {
-        ...buildings.find((building) => building.place === index),
+        ...buildings.find((building) => building.buildingSpot === index),
         ...appendSizeToGridPosition(position),
         place: index,
       }
-    },
+    }),
   )
 </script>
 

@@ -26,12 +26,12 @@ export const apiFetch = async <T = undefined>(
     ...fetchOptions,
   })
 
-  if (response.status === 204) {
-    return undefined as T
-  }
-
   if (response.status === 200) {
     return (await response.json()) as T
+  }
+
+  if (response.status < 400) {
+    return undefined as T
   }
 
   const $toast = useToast()

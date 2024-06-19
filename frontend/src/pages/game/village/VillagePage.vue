@@ -13,12 +13,10 @@
   import WholePageLoader from "../../../components/common/WholePageLoader.vue"
   import TroopsList from "../../../components/village/TroopsList.vue"
   import type { VillageDetailsDTO } from "../../../api/dtos/VillageDetailsDTO"
-  import { useToast } from "vue-toast-notification"
+  import { useInterval } from "@vueuse/core"
 
   const route = useRoute()
   const villageId = route.params[routes.game.village.param] as string
-
-  const $toast = useToast()
 
   const village = ref<VillageDetailsDTO>()
 
@@ -30,6 +28,9 @@
     village.value = await villageByIdEndpoint(villageId)
   }
   fetchVillage()
+  useInterval(60000, {
+    callback: fetchVillage,
+  })
 
   const updateBuildingsQueue = async () => {
     if (villageId === undefined) {
@@ -56,13 +57,7 @@
     <ResourcesRow :values="village.availableResources" class="resources" />
     <div class="buildings-and-troops">
       <BuildingsGrid
-        :buildings="
-          village.buildings.map((building) => ({
-            place: building.buildingSpot,
-            imageUrl: building.imageUrl,
-            level: building.level,
-          }))
-        "
+        :buildings="village.buildings"
         :village-id="villageId"
         class="buildings"
       />

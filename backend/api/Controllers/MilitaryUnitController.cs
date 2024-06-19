@@ -26,6 +26,13 @@ public class MilitaryUnitController : ControllerBase
     public async Task<ActionResult<ResultOrError>> ScheduleBuilding(
         [FromBody] MilitaryUnitParametersDTO dto, CancellationToken cancellationToken)
     {
+        var userId = this.authorizationService.ExtractUserId(this.Request);
+        bool isAuthorized = userId.HasValue && await this.authorizationService.IsUserVillageAssistantOrOwner(
+            dto.VillageId, userId.Value,
+            cancellationToken);
+
+        if (!isAuthorized) return this.Unauthorized();
+
         return await this.militaryUnitsService.ScheduleMilitaryUnitTraining(dto.VillageId, dto.MilitaryUnitId,
             dto.Amount,
             cancellationToken);
@@ -35,8 +42,15 @@ public class MilitaryUnitController : ControllerBase
     public async Task<ActionResult> UpdateBuildingsQueue(Guid villageId,
         CancellationToken cancellationToken)
     {
+        var userId = this.authorizationService.ExtractUserId(this.Request);
+        bool isAuthorized = userId.HasValue && await this.authorizationService.IsUserVillageAssistantOrOwner(
+            villageId, userId.Value,
+            cancellationToken);
+
+        if (!isAuthorized) return this.Unauthorized();
+
         await this.militaryUnitsService.UpdateMilitaryUnitsQueueForVillage(villageId, cancellationToken);
 
-        return this.Ok();
+        return this.Created();
     }
 }

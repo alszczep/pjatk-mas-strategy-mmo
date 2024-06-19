@@ -1,4 +1,3 @@
-using api.Controllers.DTOs;
 using api.DataAccess;
 using api.Models;
 using Microsoft.EntityFrameworkCore;
@@ -54,6 +53,14 @@ public class VillagesRepository : IVillagesRepository
         return this.coreDbContext.Villages
             .Where(v => v.Id == villageId)
             .Include(r => r.AvailableResources)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public Task<Village?> GetVillageByWithAssistantsOnly(Guid villageId, CancellationToken cancellationToken)
+    {
+        return this.coreDbContext.Villages
+            .Where(v => v.Id == villageId)
+            .Include(v => v.Assistants)
             .FirstOrDefaultAsync(cancellationToken);
     }
 

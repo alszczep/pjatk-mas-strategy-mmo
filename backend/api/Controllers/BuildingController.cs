@@ -40,6 +40,13 @@ public class BuildingController : ControllerBase
     public async Task<ActionResult<ResultOrError>> ScheduleBuilding(
         [FromBody] BuildingDetailsParametersWithBuildingIdDTO dto, CancellationToken cancellationToken)
     {
+        var userId = this.authorizationService.ExtractUserId(this.Request);
+        bool isAuthorized = userId.HasValue && await this.authorizationService.IsUserVillageAssistantOrOwner(
+            dto.VillageId, userId.Value,
+            cancellationToken);
+
+        if (!isAuthorized) return this.Unauthorized();
+
         return await this.buildingsService.ScheduleBuilding(dto.VillageId, dto.BuildingSpot, dto.BuildingId,
             cancellationToken);
     }
@@ -48,6 +55,13 @@ public class BuildingController : ControllerBase
     public async Task<ActionResult<ResultOrError>> ScheduleUpgrade(
         [FromBody] BuildingDetailsParametersDTO dto, CancellationToken cancellationToken)
     {
+        var userId = this.authorizationService.ExtractUserId(this.Request);
+        bool isAuthorized = userId.HasValue && await this.authorizationService.IsUserVillageAssistantOrOwner(
+            dto.VillageId, userId.Value,
+            cancellationToken);
+
+        if (!isAuthorized) return this.Unauthorized();
+
         return await this.buildingsService.ScheduleUpgrade(dto.VillageId, dto.BuildingSpot, cancellationToken);
     }
 
@@ -56,6 +70,6 @@ public class BuildingController : ControllerBase
     {
         await this.buildingsService.UpdateBuildingsQueueForVillage(villageId, cancellationToken);
 
-        return this.Ok();
+        return this.Created();
     }
 }
