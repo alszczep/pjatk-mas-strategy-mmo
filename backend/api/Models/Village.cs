@@ -4,7 +4,7 @@ public class Village
 {
     public Guid Id { get; init; }
     public string Name { get; private set; } = null!;
-    public string? CrestImageUrl { get; private set; }
+    public string? CrestImageUrl { get; set; }
     public DateTime CreationDateTime { get; init; }
 
     public Guid OwnerId { get; init; }
@@ -39,5 +39,26 @@ public class Village
             PositionX = location.PositionX,
             PositionY = location.PositionY
         };
+    }
+
+    public void ChangeName(string name)
+    {
+        this.Name = name;
+    }
+
+    public void AddAssistant(User assistant)
+    {
+        if (assistant.Id == this.Owner.Id || this.Assistants.Select(a => a.Id).Contains(assistant.Id))
+            throw new InvalidOperationException("User is already an assistant or the owner of the village.");
+
+        this.Assistants.Add(assistant);
+    }
+
+    public void RemoveAssistant(User assistant)
+    {
+        if (!this.Assistants.Select(a => a.Id).Contains(assistant.Id))
+            throw new InvalidOperationException("Owner cannot be removed as an assistant.");
+
+        this.Assistants.Remove(assistant);
     }
 }

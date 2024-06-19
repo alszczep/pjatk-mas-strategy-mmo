@@ -53,8 +53,10 @@ public class CoreDbContext : DbContext
             entity.ToTable("User");
 
             entity.Property(e => e.Username).HasMaxLength(120).IsRequired();
-            entity.Property(e => e.PasswordHash).IsRequired();
+            entity.Property(e => e.PasswordHash).HasMaxLength(120).IsRequired();
             entity.Property(e => e.JwtToken);
+
+            entity.HasIndex(e => e.Username).IsUnique();
 
             entity.HasOne(e => e.OwnedVillage).WithOne(e => e.Owner).HasForeignKey<Village>(e => e.OwnerId)
                 .IsRequired();

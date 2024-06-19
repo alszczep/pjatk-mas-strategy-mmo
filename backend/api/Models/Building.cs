@@ -10,7 +10,18 @@ public abstract class Building
     public BuildingType Type { get; init; }
 
     public ICollection<BuildingInVillage> InVillages { get; private set; } = new List<BuildingInVillage>();
-    public ICollection<BuildingLevel> Levels { get; set; } = new List<BuildingLevel>();
+
+    private ICollection<BuildingLevel> levels = new List<BuildingLevel>();
+
+    public ICollection<BuildingLevel> Levels
+    {
+        get => this.levels;
+        init
+        {
+            if (value.Any(v => v.Level != 1 && !value.Any(vv => vv.Level == v.Level - 1)))
+                throw new InvalidOperationException("Levels have to be continuous");
+        }
+    }
 }
 
 public enum BuildingType

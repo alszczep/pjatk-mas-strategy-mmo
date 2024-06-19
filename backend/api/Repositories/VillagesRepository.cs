@@ -101,4 +101,17 @@ public class VillagesRepository : IVillagesRepository
 
         await this.coreDbContext.SaveChangesAsync(cancellationToken);
     }
+
+    public Task<List<Village>> GetAllVillages(CancellationToken cancellationToken)
+    {
+        return this.coreDbContext.Villages.ToListAsync(cancellationToken);
+    }
+
+    public Task<List<Village>> GetAllVillages(Guid userId, CancellationToken cancellationToken)
+    {
+        return this.coreDbContext.Villages
+            .Include(v => v.Assistants)
+            .Where(v => v.OwnerId == userId || v.Assistants.Any(a => a.Id == userId))
+            .ToListAsync(cancellationToken);
+    }
 }

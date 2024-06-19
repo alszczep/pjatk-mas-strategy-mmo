@@ -3,9 +3,9 @@ namespace api.Models;
 public class BuildingsQueue
 {
     public Guid Id { get; init; }
-    public int LevelAfterUpgrade { get; set; }
-    public DateTime StartTime { get; set; }
-    public DateTime EndTime { get; set; }
+    public int LevelAfterUpgrade { get; init; }
+    public DateTime StartTime { get; init; }
+    public DateTime EndTime { get; init; }
 
     public BuildingInVillage BuildingInVillage { get; init; } = null!;
 }

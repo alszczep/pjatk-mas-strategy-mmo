@@ -9,6 +9,7 @@ public class MilitaryUnit
     public string? IconUrl { get; init; }
     public int MinBarracksLevel { get; init; }
     public int TrainingTimeInSeconds { get; init; }
+    public static readonly string IconPlaceholderUrl = "";
 
     public ICollection<BuildingBarracks> TrainableInBarracks { get; private set; } = new List<BuildingBarracks>();
     public Guid TrainingCostId { get; init; }
@@ -19,7 +20,7 @@ public class MilitaryUnit
 
     public ICollection<MilitaryUnitsQueue> MilitaryUnitsQueues { get; private set; } = new List<MilitaryUnitsQueue>();
 
-    private int GetStrength()
+    public int GetStrength()
     {
         return this.Attack + this.Defense;
     }

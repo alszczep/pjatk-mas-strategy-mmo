@@ -19,6 +19,8 @@
   const villageId = route.params[routes.game.village.param] as string
 
   const village = ref<VillageDetailsDTO>()
+  // HACK: when an object, that is an array element, has a field updated, it won't trigger updates
+  const updateCount = ref(0)
 
   async function fetchVillage() {
     if (villageId === undefined) {
@@ -26,6 +28,7 @@
     }
 
     village.value = await villageByIdEndpoint(villageId)
+    updateCount.value++
   }
   fetchVillage()
   useInterval(60000, {
@@ -53,11 +56,11 @@
 
 <template>
   <WholePageLoader v-if="!village" />
-  <div class="page-wrapper" v-else>
+  <div class="page-wrapper" :key="updateCount" v-else>
     <ResourcesRow :values="village.availableResources" class="resources" />
     <div class="buildings-and-troops">
       <BuildingsGrid
-        :buildings="village.buildings"
+        :buildings="village.buildings.map((b) => b)"
         :village-id="villageId"
         class="buildings"
       />
