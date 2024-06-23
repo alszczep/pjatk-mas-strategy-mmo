@@ -96,7 +96,7 @@ public class VillagesService : IVillagesService
                 Amount = mu.Amount,
                 StartTime = mu.StartTime,
                 EndTime = mu.EndTime
-            }).ToList(),
+            }).OrderBy(mu => mu.EndTime).ToList(),
             BuildingsQueue = village.Buildings.Select(b => new
                 {
                     Name = b.Building.Name,
@@ -109,7 +109,7 @@ public class VillagesService : IVillagesService
                     ToLevel = q.LevelAfterUpgrade,
                     StartTime = q.StartTime,
                     EndTime = q.EndTime
-                })).ToList()
+                })).OrderBy(mu => mu.EndTime).ToList()
         };
     }
 
